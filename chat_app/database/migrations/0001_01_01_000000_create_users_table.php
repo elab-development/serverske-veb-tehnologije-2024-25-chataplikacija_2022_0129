@@ -18,7 +18,13 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->boolean('is_admin')->default(false);
+            $table->boolean('is_banned')->default(false);
             $table->timestamps();
+        });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('email_verified_at'); // remove the column
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

@@ -42,6 +42,7 @@ class DatabaseSeeder extends Seeder
             return collect([$message->sender_id, $message->receiver_id])->sort()->implode('_');
         })->map(function ($groupedMessages) {
             return [
+                'name' => $groupedMessages->first()->sender->name . ' & ' . $groupedMessages->first()->receiver->name,
                 'user_id1' => $groupedMessages->first()->sender_id,
                 'user_id2' => $groupedMessages->first()->receiver_id,
                 'last_message_id' => $groupedMessages->last()->id,

@@ -15,7 +15,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Home() {
     return (
          
-        <ChatLayout>  MESSAGES
+        <ChatLayout> MESSAGES
         </ChatLayout>
          
     );

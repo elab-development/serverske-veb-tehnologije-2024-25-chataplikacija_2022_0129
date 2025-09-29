@@ -29,4 +29,16 @@ class Conversation extends Model
     {
         return $this->belongsTo(User::class, 'user_id2');
     }
+
+public static function getAllForUser(User $user)
+{
+    return Conversation::where(function ($q) use ($user) {
+        $q->where('user_id1', $user->id)
+          ->orWhere('user_id2', $user->id);
+    })->get();
+
+     
 }
+}
+
+ 

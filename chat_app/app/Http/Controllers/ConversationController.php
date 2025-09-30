@@ -43,7 +43,20 @@ public function searchByName(Request $request){
 
         return response()->json($conversations);
     }
+public function update(Request $request, $id)
+{
+    $conversation = Conversation::findOrFail($id);
 
+    $validated = $request->validate([
+        'name'     => 'nullable|string|max:255',
+        'user_id1' => 'sometimes|exists:users,id',
+        'user_id2' => 'sometimes|exists:users,id',
+    ]);
+
+    $conversation->update($validated);
+
+    return response()->json($conversation, 200);
+}
 
 public static function listByUserInternal(int $userId){
   

@@ -5,7 +5,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\HomeController;
 
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth','blocked'])->group(function () {
 Route::get('/', [HomeController::class, 'home'])->name('dashboard');});
  
 //Route::middleware('auth')->group(function(){Route::get('/profile')})

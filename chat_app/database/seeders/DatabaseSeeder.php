@@ -35,22 +35,45 @@ class DatabaseSeeder extends Seeder
 
         User::factory(10)->create();
 
-        Message::factory(100)->create();
-        $messages = Message::all();
+        $users = User::all();
+        $conversations = collect();
 
-        $conversations = $messages->groupBy(function ($message) {
-            return collect([$message->sender_id, $message->receiver_id])->sort()->implode('_');
-        })->map(function ($groupedMessages) {
-            return [
-                'name' => $groupedMessages->first()->sender->name . ' & ' . $groupedMessages->first()->receiver->name,
-                'user_id1' => $groupedMessages->first()->sender_id,
-                'user_id2' => $groupedMessages->first()->receiver_id,
-                'last_message_id' => $groupedMessages->last()->id,
-                'created_at' => new Carbon(),
-                'updated_at' => new Carbon(),
-            ];
-        })->values();
+        while ($conversations->count() < 20) {
+            $user1 = $users->random();
+            $user2 = $users->where('id', '!=', $user1->id)->random();
+
+            $exists = $conversations->first(function($c) use ($user1, $user2){
+                return ($c->user_id1 == $user1->id && $c->user_id2 == $user2->id)
+                    || ($c->user_id1 == $user2->id && $c->user_id2 == $user1->id);
+            });
+
+            if (!$exists) {
+                $conversations->push(Conversation::create([
+                    'user_id1' => min($user1->id, $user2->id),
+                    'user_id2' => max($user1->id, $user2->id),
+                    'name' => $user1->name . ' & ' . $user2->name,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]));
+            }
+        }
 
         Conversation::insertOrIgnore($conversations->toArray());
+
+        $messages = collect();
+        for ($i = 0; $i < 100; $i++) {
+            $conversation = $conversations->random();
+
+            $sender = collect([$conversation->user_id1, $conversation->user_id2])->random();
+            $receiver = $sender == $conversation->user_id1 ? $conversation->user_id2 : $conversation->user_id1;
+
+            $message = Message::factory()->create([
+                'conversation_id' => $conversation->id,
+                'sender_id' => $sender,
+                'receiver_id' => $receiver,
+            ]);
+
+            $messages->push($message);
+        }
     }
 }

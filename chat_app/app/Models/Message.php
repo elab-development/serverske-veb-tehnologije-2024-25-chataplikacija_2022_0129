@@ -25,6 +25,11 @@ class Message extends Model
         return $this->belongsTo(User::class, 'receiver_id');
     }
 
+    public function conversation()
+    {
+        return $this->belongsTo(Conversation::class);
+    }
+
     public function attachments()
     {
         return $this->hasMany(Attachment::class);

@@ -11,14 +11,8 @@ class Conversation extends Model
 
     protected $fillable = [
         'user_id1',
-        'user_id2',
-        'last_message_id',
+        'user_id2'
     ];
-
-    public function lastMessage()
-    {
-        return $this->belongsTo(Message::class, 'last_message_id');
-    }
 
     public function user1()
     {
@@ -30,15 +24,13 @@ class Conversation extends Model
         return $this->belongsTo(User::class, 'user_id2');
     }
 
-public static function getAllForUser(User $user)
-{
-    return Conversation::where(function ($q) use ($user) {
-        $q->where('user_id1', $user->id)
-          ->orWhere('user_id2', $user->id);
-    })->get();
-
-     
-}
+    public static function getAllForUser(User $user)
+    {
+        return Conversation::where(function ($q) use ($user) {
+            $q->where('user_id1', $user->id)
+            ->orWhere('user_id2', $user->id);
+        })->get();
+    }
 }
 
  

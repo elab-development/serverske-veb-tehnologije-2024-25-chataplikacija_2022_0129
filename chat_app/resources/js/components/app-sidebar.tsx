@@ -5,22 +5,28 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { CircleUserRound } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
+        title: 'Pera & Zika',
+        href: dashboard(), //iz index.ts -> ruta ka dashboard
+        icon: CircleUserRound,
     },
 ];
+//ovde pravi sta sve ide u sidebar
 
 const footerNavItems: NavItem[] = [
      
 ];
 
-export function AppSidebar() {
+export function AppSidebar({ conversations = [] }: { conversations: any[] }) {
+    const conversationsForSidebar: NavItem[] = conversations.map((conversation) => ({
+        title: conversation.name,
+        href: `/conversations/${conversation.id}`,
+        icon: CircleUserRound
+    }))
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -36,7 +42,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={conversationsForSidebar} />
             </SidebarContent>
 
             <SidebarFooter>

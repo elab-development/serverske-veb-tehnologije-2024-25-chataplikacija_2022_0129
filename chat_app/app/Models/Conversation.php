@@ -10,9 +10,12 @@ class Conversation extends Model
     use HasFactory;
 
     protected $fillable = [
+        'name',
         'user_id1',
         'user_id2'
     ];
+
+    protected $with = ['user1', 'user2'];
 
     public function user1()
     {
@@ -31,6 +34,12 @@ class Conversation extends Model
             ->orWhere('user_id2', $user->id);
         })->get();
     }
+
+    public function hasUser($userId): bool
+    {
+        return $this->user_id1 == $userId || $this->user_id2 == $userId;
+    }
+
 }
 
  

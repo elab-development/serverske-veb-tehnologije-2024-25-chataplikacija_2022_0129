@@ -30,13 +30,46 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
+export interface PageProps {
+  auth: {
+    user: User
+  }
+  conversations: Conversation[];
+  selectedConversation: Conversation | null;
+  [key: string]: unknown;
+}
+
+
 export interface User {
     id: number;
     name: string;
     email: string;
-    avatar?: string;
-    email_verified_at: string | null;
+    password: string;
+    is_admin: boolean;
+    is_blocked: boolean;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
+}
+
+export interface Message {
+    id: number;
+    sender_id: number;
+    receiver_id: number;
+    conversation_id: number;
+    content: string;
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown;
+}
+
+export interface Conversation {
+    id: number;
+    name: string;
+    user_id1: number;
+    user_id2: number;
+    //messages: Message[];
+    created_at: string;
+    updated_at: string;
+    [key: string]: unknown;
 }

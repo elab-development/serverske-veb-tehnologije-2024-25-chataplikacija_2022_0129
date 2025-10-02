@@ -16,4 +16,9 @@ class Attachment extends Model
         'mime',
         'size',
     ];
+
+    public function message()
+    {
+        return $this->belongsTo(Message::class);
+    }
 }

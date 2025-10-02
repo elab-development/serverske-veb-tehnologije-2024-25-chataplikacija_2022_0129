@@ -8,21 +8,12 @@ import { Link } from '@inertiajs/react';
 import { CircleUserRound } from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Pera & Zika',
-        href: dashboard(), //iz index.ts -> ruta ka dashboard
-        icon: CircleUserRound,
-    },
-];
-//ovde pravi sta sve ide u sidebar
-
 const footerNavItems: NavItem[] = [
      
 ];
 
 export function AppSidebar({ conversations = [] }: { conversations: any[] }) {
-    const conversationsForSidebar: NavItem[] = conversations.map((conversation) => ({
+    const mainNavItems: NavItem[] = conversations.map((conversation) => ({
         title: conversation.name,
         href: `/conversations/${conversation.id}`,
         icon: CircleUserRound
@@ -42,7 +33,7 @@ export function AppSidebar({ conversations = [] }: { conversations: any[] }) {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={conversationsForSidebar} />
+                <NavMain items={mainNavItems} />
             </SidebarContent>
 
             <SidebarFooter>

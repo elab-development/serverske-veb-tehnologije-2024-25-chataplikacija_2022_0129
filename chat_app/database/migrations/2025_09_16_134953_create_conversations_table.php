@@ -11,9 +11,11 @@ return new class extends Migration
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
-            $table->foreignId('user_id1')->constrained('users');
-            $table->foreignId('user_id2')->constrained('users');
+            $table->foreignId('user_id1')->constrained('users')->onDelete('cascade');
+            $table->foreignId('user_id2')->constrained('users')->onDelete('cascade');
             $table->timestamps();
+
+            $table->unique(['user_id1', 'user_id2']);
         });
     }
 

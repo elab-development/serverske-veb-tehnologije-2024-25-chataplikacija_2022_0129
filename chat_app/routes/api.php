@@ -9,7 +9,7 @@ use App\Http\Controllers\AdminController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::middleware('auth')->post('/logout', [AuthController::class, 'logout']);
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
 Route::resource('messages', MessageController::class)->middleware('auth');
 
@@ -17,9 +17,9 @@ Route::post('/conversations/by-user', [ConversationController::class, 'listByUse
 Route::get('/conversations', [ConversationController::class, 'searchByName']);
 Route::put('/conversations', [ConversationController::class, 'update']);
 
-Route::middleware(['auth', 'is_admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
     Route::get('/users', [AdminController::class, 'getUsers']);
-    Route::delete('/users/{user}', [AdminController::class, 'deleteUser']);
+    Route::delete('/users/{user}/delete', [AdminController::class, 'deleteUser']);
     Route::post('/users/{user}/block', [AdminController::class, 'blockUser']);
     Route::post('/users/{user}/unblock', [AdminController::class, 'unblockUser']);
 });

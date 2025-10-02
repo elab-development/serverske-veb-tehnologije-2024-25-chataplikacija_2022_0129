@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
+
 
 class AdminController extends Controller
 {
     public function getUsers(Request $request)
     {
-        $perPage = $request->get('per_page', 15);
+        //$perPage = $request->get('per_page', 15);
         $search = $request->get('search', '');
         $filter = $request->get('filter', 'all'); // all, blocked, admins
 
@@ -30,7 +32,7 @@ class AdminController extends Controller
                 break;
         }
 
-        $users = $query->orderBy('created_at', 'desc')->paginate($perPage);
+        $users = $query->orderBy('created_at', 'desc')->get();
 
         return response()->json($users);
     }

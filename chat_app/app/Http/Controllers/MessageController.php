@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Message;
+use App\Models\User;
+use App\Models\Conversation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class MessageController extends Controller
 {
@@ -68,5 +72,46 @@ class MessageController extends Controller
     {
         $message->delete();
         return response()->json(['message' => 'Deleted successfully'], 204);
+    }
+
+    public function sendMessage(Request $request){
+        
+        $request->validate([
+            'receiver_id' => 'required|exists:users,id',
+            'content' => 'nullable|string',
+        ]);
+
+        $sender_id = Auth::id();
+        $receiver_id = $request->receiver_id;
+
+        $conversation = Conversation::where(function ($q) use ($sender_id, $receiver_id) {
+            $q->where('user_id1', $sender_id)->where('user_id2', $receiver_id)
+            ->orWhere('user_id2', $sender_id)->where('user_id1', $receiver_id);
+        })->first();
+
+        $sender = User::findOrFail($sender_id);
+        $receiver = User::findOrFail($receiver_id);
+
+        if(!$conversation){
+            $conversation = Conversation::create([
+                'user_id1' => min($sender_id, $receiver_id),
+                'user_id2' => max($sender_id, $receiver_id),
+                'name' => $sender->name . ' & ' . $receiver->name,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+        }
+
+        $message = Message::create([
+            'sender_id' => $sender_id,
+            'receiver_id' => $receiver_id,
+            'conversation_id' => $conversation->id,
+            'content' => $request->content,
+        ]);
+
+        return response()->json([
+            'message' => 'Message sent successfully',
+            'data' => $message,
+        ], 201);
     }
 }

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Message;
 use App\Models\Conversation;
+use App\Models\Attachment;
 use Carbon\Carbon;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -48,17 +49,15 @@ class DatabaseSeeder extends Seeder
             });
 
             if (!$exists) {
-                $conversations->push(Conversation::create([
+                $conversation = Conversation::factory()->create([
                     'user_id1' => min($user1->id, $user2->id),
                     'user_id2' => max($user1->id, $user2->id),
                     'name' => $user1->name . ' & ' . $user2->name,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ]));
+                ]);
+
+                $conversations->push($conversation);
             }
         }
-
-        Conversation::insertOrIgnore($conversations->toArray());
 
         $messages = collect();
         for ($i = 0; $i < 100; $i++) {
@@ -74,6 +73,19 @@ class DatabaseSeeder extends Seeder
             ]);
 
             $messages->push($message);
+        }
+
+        $attachments = collect();
+        foreach ($messages as $message) {
+            if (rand(0, 1)) {
+                $attachment = Attachment::factory()->create([
+                    'message_id' => $message->id,
+                    'created_at' => $message->created_at,
+                    'updated_at' => $message->updated_at,
+                ]);
+
+                $attachments->push($attachment);
+            }
         }
     }
 }

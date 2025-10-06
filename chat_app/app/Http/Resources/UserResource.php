@@ -20,9 +20,7 @@ class UserResource extends JsonResource
          'name' => $this->name,
           'email' => $this->email,
         'is_admin' => (bool) $this->is_admin,
-         'is_blocked' => (bool) $this->is_blocked,
-        'last_message' => $this->last_message,
-        'last_message_date' => $this->last_message_date,
+         'is_blocked' => (bool) $this->is_blocked
         ];
     }
 }

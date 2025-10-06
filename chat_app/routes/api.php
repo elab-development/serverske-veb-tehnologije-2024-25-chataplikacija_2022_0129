@@ -11,6 +11,7 @@ Route::post('/register', [AuthController::class, 'register']); //ova
 Route::post('/login', [AuthController::class, 'login']); //ova
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']); //ova
+    Route::get('/user', [AuthController::class, 'me']);
 
     Route::post('/send-message', [MessageController::class, 'sendMessage']); //ova
 });
@@ -22,8 +23,8 @@ Route::put('/conversations', [ConversationController::class, 'update']);
 Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
     Route::get('/users', [AdminController::class, 'getUsers']);
     Route::delete('/users/{user}/delete', [AdminController::class, 'deleteUser']);
-    Route::post('/users/{user}/block', [AdminController::class, 'blockUser']);
-    Route::post('/users/{user}/unblock', [AdminController::class, 'unblockUser']);
+    Route::put('/users/{user}/block', [AdminController::class, 'blockUser']);
+    Route::put('/users/{user}/unblock', [AdminController::class, 'unblockUser']);
 
     Route::apiResource('/messages', MessageController::class); //ova
     

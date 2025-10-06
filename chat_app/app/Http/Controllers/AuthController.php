@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -27,12 +28,13 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $expiresAt = Carbon::now()->addDays(7);
+        $token = $user->createToken('auth_token', ['*'], $expiresAt)->plainTextToken;;
 
         return response()->json([
             'user' => $user,
             'token' => $token,
-            'token_type' => 'Bearer',
+            'expires_at' => $expiresAt->toIso8601String(),
         ], 201);
     }
 
@@ -41,6 +43,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required',
+            'remember' => 'boolean',
         ]);
 
         if ($validator->fails()) {
@@ -59,12 +62,20 @@ class AuthController extends Controller
             return response()->json(['message' => 'Your account has been blocked.'], 403);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $user->tokens()->delete();
+
+        if ($request->remember) {
+            $expiresAt = Carbon::now()->addYear();
+        } else{
+            $expiresAt = Carbon::now()->addDay();
+        }
+
+        $token = $user->createToken('auth_token', ['*'], $expiresAt)->plainTextToken;
 
         return response()->json([
             'user' => $user,
             'token' => $token,
-            'token_type' => 'Bearer',
+            'expires_at' => $expiresAt->toIso8601String(),
         ]);
     }
 

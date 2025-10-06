@@ -10,7 +10,6 @@ class AdminController extends Controller
 {
     public function getUsers(Request $request)
     {
-        //$perPage = $request->get('per_page', 15);
         $search = $request->get('search', '');
         $filter = $request->get('filter', 'all'); // all, blocked, admins
 

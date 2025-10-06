@@ -51,6 +51,7 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
+        \Log::info('user type', ['user' => $user]);
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
@@ -88,6 +89,7 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
+        \Log::info('user type', ['user' => $request->user()]);
         return response()->json($request->user());
     }
 }

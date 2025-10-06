@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Conversation;
-use App\Resources\ConversationResource;
+use App\Http\Resources\ConversationResource;
 use Exception;
 
 class ConversationController extends Controller
@@ -20,17 +20,14 @@ class ConversationController extends Controller
 
             $userId = $request->user_id;
             \Log::info('listByUser hit 3', ['user_id' => $userId]);
-            $conversations = Conversation::where(function ($q) use ($userId) {
-                $q->where('user_id1', $userId)
-                ->orWhere('user_id2', $userId);
-            })->get();
+            $conversations = Conversation::getAllForUser(User::find($userId));
             \Log::info('listByUser hit 4', ['conversations' => $conversations]);
             
             foreach($conversations as $c){
                 \Log::info("conversation id {$c->id}", ['conversation' => $c]);
             }
-            
-            return response()->json($conversations->toArray());
+            \Log::info('Conversations as array', ['data' => $conversations->toArray()]);
+            return response()->json($conversations);
         } catch (Exception $e) {
             return response()->json([
                 'error' => true,

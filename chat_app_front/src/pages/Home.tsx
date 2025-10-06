@@ -13,24 +13,32 @@ export default function Home() {
     const [sortedConversations, setSortedConversations] = useState<Conversation[]>([]);
     const [onlineUsers, setOnlineUsers] = useState<Record<number, User>>({});
     const isUserOnline = (userId: number) => Boolean(onlineUsers[userId]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchData = async () => {
-            if(!user) return;
+        if(!user?.id) {
+            setLoading(false);
+            return
+        }
+        const fetchConversations = async () => {
+            try {
+                setLoading(true);
+                const response = await api.get<Conversation[]>(
+                    `/conversations/by-user?user_id=${user?.id}`
+                );
 
-            try{
-                console.log(user.id);
-                const conversationsResponse = await api.get<Conversation[]>('/conversations/by-user?user_id=' + user.id);
-                setConversations(conversationsResponse.data);
-            } catch (error) {
-                console.error(error);
+                setConversations(response.data);
+                setError(null);
+            } catch (err: any) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
             }
         };
-
-        fetchData();
-        console.log('user', user);
-        console.log('conversations', conversations);
-    }, []);
+    
+        fetchConversations();
+    }, [user?.id]);
 
     useEffect(() => {
         setSortedConversations(
@@ -48,9 +56,9 @@ export default function Home() {
         );
     }, [localConversations]);
 
-    /*useEffect(() => {
+    useEffect(() => {
         setLocalConversations(conversations);
-    }, [conversations]);*/
+    }, [conversations]);
 
     /*useEffect(() => {
         const channel = echo
@@ -78,5 +86,11 @@ export default function Home() {
         };
     }, []);*/
 
-    return <ChatLayout conversations={sortedConversations}></ChatLayout>;
+    return (
+        <>
+            {loading && <div>Loading...</div>}
+            {error && <div>{error}</div>}
+            <ChatLayout conversations={sortedConversations}></ChatLayout>
+        </>
+    )
 }

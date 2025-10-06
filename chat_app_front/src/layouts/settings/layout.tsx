@@ -8,32 +8,31 @@ import { cn } from '../../lib/utils';
 import { type NavItem } from '../../types';
 //import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 const sidebarNavItems: NavItem[] = [
     {
         title: 'Profile',
-        href: edit(),
+        href: '/profile',
         icon: null,
     },
     {
         title: 'Password',
-        href: editPassword(),
+        href: '/edit-password',
         icon: null,
     },
     {
         title: 'Appearance',
-        href: editAppearance(),
+        href: '/edit-appearance',
         icon: null,
     },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
-    // When server-side rendering, we only render the layout on the client...
-    if (typeof window === 'undefined') {
+    /*if (typeof window === 'undefined') {
         return null;
-    }
-
-    const currentPath = window.location.pathname;
+    }*/
+    const location = useLocation();
 
     return (
         <div className="px-4 py-6">
@@ -44,15 +43,15 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                     <nav className="flex flex-col space-y-1 space-x-0">
                         {sidebarNavItems.map((item, index) => (
                             <Button
-                                key={`${typeof item.href === 'string' ? item.href : item.href.url}-${index}`}
+                                key={`${typeof item.href === 'string' ? item.href : item.href}-${index}`}
                                 size="sm"
                                 variant="ghost"
                                 asChild
                                 className={cn('w-full justify-start', {
-                                    'bg-muted': currentPath === (typeof item.href === 'string' ? item.href : item.href.url),
+                                    'bg-muted': location.pathname === (typeof item.href === 'string' ? item.href : item.href),
                                 })}
                             >
-                                <Link href={item.href} prefetch>
+                                <Link to={item.href} >
                                     {item.icon && <item.icon className="h-4 w-4" />}
                                     {item.title}
                                 </Link>

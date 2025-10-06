@@ -33,6 +33,9 @@ export function NavUser() {
                         className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
                         align="end"
                         side={isMobile ? 'bottom' : state === 'collapsed' ? 'left' : 'bottom'}
+                        sideOffset={5}
+                        avoidCollisions={true}
+                        collisionPadding={8}
                     >
                         <UserMenuContent user={user} />
                     </DropdownMenuContent>

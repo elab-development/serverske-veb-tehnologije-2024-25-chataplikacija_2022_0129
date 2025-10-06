@@ -99,7 +99,6 @@ export interface Conversation {
     name: string;
     user_id1: number;
     user_id2: number;
-    //messages: Message[];
     created_at: string;
     updated_at: string;
     [key: string]: unknown;

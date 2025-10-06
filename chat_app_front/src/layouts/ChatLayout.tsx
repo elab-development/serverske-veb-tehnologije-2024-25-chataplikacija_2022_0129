@@ -6,7 +6,7 @@ export default function ChatLayout({ conversations = [] }: { conversations: Conv
     
 
     return (
-        <AppShell variant="sidebar">
+        <AppShell variant="header">
             <AppSidebar conversations={conversations}/>
             <div className="flex w-full flex-col"></div>
         </AppShell>

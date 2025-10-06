@@ -32,7 +32,7 @@ class Conversation extends Model
         return Conversation::where(function ($q) use ($user) {
             $q->where('user_id1', $user->id)
             ->orWhere('user_id2', $user->id);
-        })->get();
+        })->with(['user1', 'user2'])->get();
     }
 
     public function hasUser($userId): bool

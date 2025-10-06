@@ -16,7 +16,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/send-message', [MessageController::class, 'sendMessage']); //ova
 });
 
-Route::post('/conversations/by-user', [ConversationController::class, 'listByUser']);
+Route::get('/conversations/by-user', [ConversationController::class, 'listByUser']);
 Route::get('/conversations', [ConversationController::class, 'searchByName']); //ova
 Route::put('/conversations', [ConversationController::class, 'update']);
 

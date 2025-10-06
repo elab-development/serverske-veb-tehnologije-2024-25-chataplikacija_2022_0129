@@ -16,10 +16,9 @@ class ConversationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user1_name' => $this->user1->name ?? null,
-            'user2_name' => $this->user2->name ?? null,
-            'last_message_content' => $this->lastMessage->content ?? null,
-          
+            'name' => $this->name,
+            'user_id1' => $this->user_id1,
+            'user_id2' => $this->user_id2,
         ];
     }
 }

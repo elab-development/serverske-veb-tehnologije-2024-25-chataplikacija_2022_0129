@@ -1,9 +1,10 @@
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from './ui/sidebar';
 import { type NavItem } from '../types';
-//import { Link, usePage } from '@inertiajs/react';
+import { Link, useLocation } from 'react-router-dom';
 
 export function NavMain({ items = [] }: { items: NavItem[] }) {
-    const page = usePage();
+    const location = useLocation();
+
     return (
         <SidebarGroup className="px-2 py-0">
             <SidebarGroupLabel>Conversations</SidebarGroupLabel>
@@ -12,10 +13,10 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                     <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton
                             asChild
-                            isActive={page.url.startsWith(typeof item.href === 'string' ? item.href : item.href.url)}
+                            isActive={location.pathname.startsWith(item.href)}
                             tooltip={{ children: item.title }}
                         >
-                            <Link href={item.href} prefetch>
+                            <Link to={item.href} >
                                 {item.icon && <item.icon />}
                                 <span>{item.title}</span>
                             </Link>

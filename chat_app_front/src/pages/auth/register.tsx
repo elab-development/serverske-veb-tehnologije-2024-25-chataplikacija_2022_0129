@@ -30,7 +30,7 @@ export default function Register() {
 
         try {
             await register({name, email, password, password_confirmation});
-            navigate('/home');
+            navigate('/');
         } catch (error: any) {
             const axiosError = error as AxiosError<ValidationError>;
             if(axiosError.response?.data?.errors){

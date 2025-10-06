@@ -3,9 +3,10 @@ import { type User, type Conversation } from '../types';
 import { useEffect, useState } from 'react';
 import echo from '../echo';
 import api from '../api';
+import { useAuth } from '../context/auth-provider';
 
 export default function Home() {
-    const [user, setUser] = useState<User | null>(null);
+    const { user } = useAuth();
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
     const [localConversations, setLocalConversations] = useState<Conversation[]>(conversations);
@@ -15,11 +16,11 @@ export default function Home() {
 
     useEffect(() => {
         const fetchData = async () => {
-            try{
-                const userResponse = await api.get<User>('/me');
-                setUser(userResponse.data);
+            if(!user) return;
 
-                const conversationsResponse = await api.get<Conversation[]>('/conversations/by-user?user_id=' + userResponse.data.id);
+            try{
+                console.log(user.id);
+                const conversationsResponse = await api.get<Conversation[]>('/conversations/by-user?user_id=' + user.id);
                 setConversations(conversationsResponse.data);
             } catch (error) {
                 console.error(error);
@@ -47,11 +48,11 @@ export default function Home() {
         );
     }, [localConversations]);
 
-    useEffect(() => {
+    /*useEffect(() => {
         setLocalConversations(conversations);
-    }, [conversations]);
+    }, [conversations]);*/
 
-    useEffect(() => {
+    /*useEffect(() => {
         const channel = echo
             .join('online')
             .here((users: User[]) => {
@@ -75,7 +76,7 @@ export default function Home() {
         return () => {
             echo.leave('online');
         };
-    }, []);
+    }, []);*/
 
     return <ChatLayout conversations={sortedConversations}></ChatLayout>;
 }

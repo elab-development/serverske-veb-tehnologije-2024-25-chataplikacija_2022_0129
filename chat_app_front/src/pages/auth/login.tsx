@@ -35,7 +35,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
         try {
             await login({email, password}, remember === true);
-            navigate('/home');
+            navigate('/');
         } catch (error: any) {
             const axiosError = error as AxiosError<ValidationError>;
             if(axiosError.response?.data?.errors){

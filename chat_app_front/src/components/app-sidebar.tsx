@@ -22,7 +22,7 @@ export function AppSidebar({ conversations = [] }: { conversations: Conversation
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link to='/home'>
+                            <Link to='/'>
                                 <div>ChatApp</div>
                             </Link>
                         </SidebarMenuButton>

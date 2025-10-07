@@ -5,6 +5,7 @@ import Login from './pages/auth/login'
 import { ProtectedRoute } from './routes/protected-route'
 import Register from './pages/auth/register'
 import { AuthProvider } from './context/auth-provider'
+import { ConversationsProvider } from './context/conversations-provider'
 
 function App() {
 
@@ -12,21 +13,24 @@ function App() {
     <>
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={
-              <ProtectedRoute>
-                <AppLayout>
+          <ConversationsProvider>
+            <Routes>
+              <Route path="/" element={
+                <ProtectedRoute>
                   <Home />
-                </AppLayout>
-              </ProtectedRoute>
+                </ProtectedRoute>
+                } />
+              <Route path="/login" element={
+                <Login canResetPassword={true} />
+                } />
+              <Route path='/register' element={
+                <Register />
+              }/>
+              <Route path="/conversations/:conversationId?" element={
+                <Home />
               } />
-            <Route path="/login" element={
-              <Login canResetPassword={true} />
-              } />
-            <Route path='/register' element={
-              <Register />
-            }/>
-          </Routes>
+            </Routes>
+          </ConversationsProvider>
         </AuthProvider>
       </BrowserRouter>
     </>

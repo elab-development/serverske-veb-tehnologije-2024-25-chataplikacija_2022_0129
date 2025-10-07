@@ -30,15 +30,6 @@ export interface SharedData { //ovo isto koristi za inertia
     [key: string]: unknown;
 }
 
-export interface PageProps {  //ovo isto koristi za inertia
-  auth: {
-    user: User
-  }
-  conversations: Conversation[];
-  selectedConversation: Conversation | null;
-  [key: string]: unknown;
-}
-
 
 
 
@@ -97,9 +88,9 @@ export interface Message {
 export interface Conversation {
     id: number;
     name: string;
-    user_id1: number;
-    user_id2: number;
     created_at: string;
     updated_at: string;
+    user1: User;
+    user2: User;
     [key: string]: unknown;
 }

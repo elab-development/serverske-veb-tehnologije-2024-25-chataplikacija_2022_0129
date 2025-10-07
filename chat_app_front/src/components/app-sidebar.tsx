@@ -1,21 +1,37 @@
-import { NavFooter } from '../components/nav-footer';
 import { NavMain } from '../components/nav-main';
 import { NavUser } from '../components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../components/ui/sidebar';
 import { type Conversation, type NavItem } from '../types';
 import { CircleUserRound } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useConversations } from '../context/conversations-provider';
+import { useEffect, useState } from 'react';
 
-const footerNavItems: NavItem[] = [
-     
-];
+export function AppSidebar() {
+    const { conversations, loading, error } = useConversations();
+    const [localConversations, setLocalConversations] = useState<Conversation[]>(conversations);
+    const [sortedConversations, setSortedConversations] = useState<Conversation[]>([]);
+    
+    useEffect(() => {
+        setSortedConversations(
+            [...localConversations].sort((a, b) => {
+                if (a.updated_at && b.updated_at) {
+                    return b.updated_at.localeCompare(a.updated_at);
+                } else if (a.updated_at) {
+                    return -1;
+                } else if (b.updated_at) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }),
+        );
+    }, [localConversations]);
 
-export function AppSidebar({ conversations = [] }: { conversations: Conversation[] }) {
-    const mainNavItems: NavItem[] = conversations.map((conversation) => ({
-        title: conversation.name,
-        href: `/conversations/${conversation.id}`,
-        icon: CircleUserRound
-    }))
+    useEffect(() => {
+        setLocalConversations(conversations);
+    }, [conversations]);
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -31,11 +47,12 @@ export function AppSidebar({ conversations = [] }: { conversations: Conversation
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={sortedConversations} />
+                {loading && <div>Loading...</div>}
+                {error && <div>{error}</div>}
             </SidebarContent>
-
+            
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

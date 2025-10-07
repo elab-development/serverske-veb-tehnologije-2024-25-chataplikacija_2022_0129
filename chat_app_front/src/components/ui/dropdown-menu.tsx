@@ -5,9 +5,33 @@ import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react"
 import { cn } from "../../lib/utils"
 
 function DropdownMenu({
+  children,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
-  return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />
+  const [open, setOpen] = React.useState(false);
+  const prevOverflow = React.useRef<string>("");
+
+  React.useEffect(() => {
+    if (open) {
+      prevOverflow.current = document.body.style.overflow || "";
+      // уклони атрибут ако постоји (који је вероватно додао неки overlay)
+      if (document.body.hasAttribute("data-scroll-locked")) {
+        document.body.removeAttribute("data-scroll-locked");
+      }
+      // осигурај да body није hidden
+      document.body.style.overflow = "visible";
+    } else {
+      // врати претходно стање
+      document.body.style.overflow = prevOverflow.current;
+    }
+
+    return () => {
+      document.body.style.overflow = prevOverflow.current;
+    };
+  }, [open]);
+  return <DropdownMenuPrimitive.Root open={open} onOpenChange={setOpen} data-slot="dropdown-menu" {...props}>
+    {children}
+  </DropdownMenuPrimitive.Root>
 }
 
 function DropdownMenuPortal({

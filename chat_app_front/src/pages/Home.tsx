@@ -4,61 +4,25 @@ import { useEffect, useState } from 'react';
 import echo from '../echo';
 import api from '../api';
 import { useAuth } from '../context/auth-provider';
+import AppLayout from '../layouts/app-layout';
+import { useConversations } from '../context/conversations-provider';
+import { useParams } from 'react-router-dom';
 
 export default function Home() {
-    const { user } = useAuth();
-    const [conversations, setConversations] = useState<Conversation[]>([]);
-    const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
-    const [localConversations, setLocalConversations] = useState<Conversation[]>(conversations);
-    const [sortedConversations, setSortedConversations] = useState<Conversation[]>([]);
+    const { conversationId } = useParams<{ conversationId?: string }>();
+    const { selectConversation,selectConversationById, selectedConversation } = useConversations();
+
     const [onlineUsers, setOnlineUsers] = useState<Record<number, User>>({});
     const isUserOnline = (userId: number) => Boolean(onlineUsers[userId]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if(!user?.id) {
-            setLoading(false);
-            return
+        if (conversationId) {
+            selectConversationById(Number(conversationId));
         }
-        const fetchConversations = async () => {
-            try {
-                setLoading(true);
-                const response = await api.get<Conversation[]>(
-                    `/conversations/by-user?user_id=${user?.id}`
-                );
-
-                setConversations(response.data);
-                setError(null);
-            } catch (err: any) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-    
-        fetchConversations();
-    }, [user?.id]);
-
-    useEffect(() => {
-        setSortedConversations(
-            [...localConversations].sort((a, b) => {
-                if (a.updated_at && b.updated_at) {
-                    return b.updated_at.localeCompare(a.updated_at);
-                } else if (a.updated_at) {
-                    return -1;
-                } else if (b.updated_at) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            }),
-        );
-    }, [localConversations]);
-
-    useEffect(() => {
-        setLocalConversations(conversations);
-    }, [conversations]);
+        else {
+            selectConversation(null);
+        }
+    }, [conversationId]);
 
     /*useEffect(() => {
         const channel = echo
@@ -88,9 +52,13 @@ export default function Home() {
 
     return (
         <>
-            {loading && <div>Loading...</div>}
-            {error && <div>{error}</div>}
-            <ChatLayout conversations={sortedConversations}></ChatLayout>
+            
+            <AppLayout>
+                {/*<ChatLayout conversations={sortedConversations}></ChatLayout>*/}
+                <h2>Ovde ce ici chat layout u kome ce biti poruke iz izabranog ceta</h2>
+                selectedConversation: {JSON.stringify(selectedConversation)}
+            </AppLayout>
+            
         </>
     )
 }

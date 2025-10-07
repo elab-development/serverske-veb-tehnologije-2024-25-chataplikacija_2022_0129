@@ -11,22 +11,14 @@ use Exception;
 class ConversationController extends Controller
 {
     public function listByUser(Request $request){
-        \Log::info('listByUser hit 1', ['query' => $request->all()]);
         try {
-            \Log::info('listByUser hit 2', ['query' => $request->all()]);
             $request->validate([
                     'user_id' => 'required|integer|exists:users,id'
                 ]);
 
             $userId = $request->user_id;
-            \Log::info('listByUser hit 3', ['user_id' => $userId]);
             $conversations = Conversation::getAllForUser(User::find($userId));
-            \Log::info('listByUser hit 4', ['conversations' => $conversations]);
             
-            foreach($conversations as $c){
-                \Log::info("conversation id {$c->id}", ['conversation' => $c]);
-            }
-            \Log::info('Conversations as array', ['data' => $conversations->toArray()]);
             return response()->json($conversations);
         } catch (Exception $e) {
             return response()->json([

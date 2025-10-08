@@ -74,6 +74,24 @@ class MessageController extends Controller
         return response()->json(['message' => 'Deleted successfully'], 204);
     }
 
+    public function getMessagesByConversation(Request $request){
+        try{
+            $request->validate([
+                'conversation_id' => 'required|exists:conversations,id'
+            ]);
+
+            $conversationId = $request->conversation_id;
+            $messages = Message::getMessagesForConversation(Conversation::find($conversationId));
+
+            return response()->json($messages);
+        } catch(Exception $e) {
+            return response()->json([
+                'error' => true,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function sendMessage(Request $request){
         
         $request->validate([

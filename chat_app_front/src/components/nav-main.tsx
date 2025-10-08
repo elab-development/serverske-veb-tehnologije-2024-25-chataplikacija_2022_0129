@@ -11,8 +11,6 @@ export function NavMain({ items = [] }: { items: Conversation[] }) {
 
     return (
         <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>Conversations</SidebarGroupLabel>
-            {/*OVDE DODATI TEXT BOX ZA PRETRAGU*/}
             <SidebarMenu>
                 {items.map((item) => (
                     <SidebarMenuItem key={item.id}>

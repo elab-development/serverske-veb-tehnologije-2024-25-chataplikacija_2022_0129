@@ -7,18 +7,19 @@ use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 
-Route::post('/register', [AuthController::class, 'register']); //ova
-Route::post('/login', [AuthController::class, 'login']); //ova
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']); //ova
+    Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'me']);
 
-    Route::post('/send-message', [MessageController::class, 'sendMessage']); //ova
-});
+    Route::post('/send-message', [MessageController::class, 'sendMessage']);
+    Route::get('/conversations/by-user', [ConversationController::class, 'listByUser']);
+    Route::get('/conversations', [ConversationController::class, 'searchByName']);
+    Route::put('/conversations', [ConversationController::class, 'update']);
 
-Route::get('/conversations/by-user', [ConversationController::class, 'listByUser']);
-Route::get('/conversations', [ConversationController::class, 'searchByName']); //ova
-Route::put('/conversations', [ConversationController::class, 'update']);
+    Route::get('/messages/by-conversation', [MessageController::class, 'getMessagesByConversation']);
+});
 
 Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
     Route::get('/users', [AdminController::class, 'getUsers']);
@@ -26,6 +27,6 @@ Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
     Route::put('/users/{user}/block', [AdminController::class, 'blockUser']);
     Route::put('/users/{user}/unblock', [AdminController::class, 'unblockUser']);
 
-    Route::apiResource('/messages', MessageController::class); //ova
+    Route::apiResource('/messages', MessageController::class);
     
 });

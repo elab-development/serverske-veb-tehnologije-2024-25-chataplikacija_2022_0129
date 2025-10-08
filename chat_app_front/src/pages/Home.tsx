@@ -1,5 +1,5 @@
 import ChatLayout from '../layouts/ChatLayout';
-import { type User, type Conversation } from '../types';
+import { type User, type Conversation, Message } from '../types';
 import { useEffect, useState } from 'react';
 import echo from '../echo';
 import api from '../api';
@@ -55,13 +55,45 @@ export default function Home() {
         };
     }, []);*/
 
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const fetchMessages = async () => {
+        if (!selectedConversation) {
+            setLoading(false);
+            return;
+        }
+
+        try{
+            setLoading(true);
+            const response = await api.get<Message[]>('/messages/by-conversation?conversation_id=' + selectedConversation.id);
+            
+            setMessages(response.data);
+            setError(null);
+        } catch (err: any) {
+            console.error('Error fetching messages:', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchMessages();
+    }, [selectedConversation]);
+
     return (
         <>
-            
             <AppLayout>
                 {/*<ChatLayout conversations={sortedConversations}></ChatLayout>*/}
-                <h2>Ovde ce ici chat layout u kome ce biti poruke iz izabranog ceta</h2>
-                selectedConversation: {JSON.stringify(selectedConversation)}
+                {loading && <div>Loading...</div>}
+                {error && <div>{error}</div>}
+                {messages.map((message) => (
+                    <div key={message.id}>
+                        <div>{message.sender.name}: {message.content}</div>
+                    </div>
+                ))}
             </AppLayout>
             
         </>

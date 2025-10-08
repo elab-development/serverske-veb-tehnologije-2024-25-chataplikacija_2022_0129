@@ -53,7 +53,10 @@ class Conversation extends Model
             });
         }
 
-        $conversations = $query->with(['user1', 'user2'])->orderBy('updated_at', 'desc')->get();
+        $conversations = $query->with([
+            'user1', 
+            'user2'
+        ])->orderBy('updated_at', 'desc')->get();
 
         return $conversations;
     }

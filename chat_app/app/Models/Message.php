@@ -35,4 +35,11 @@ class Message extends Model
     {
         return $this->hasMany(Attachment::class);
     }
+
+    public static function getMessagesForConversation(Conversation $conversation){
+        return Message::where('conversation_id', $conversation->id)
+        ->with(['sender', 'receiver', 'attachments'])
+        ->orderBy('created_at', 'asc')
+        ->get();
+    }
 }

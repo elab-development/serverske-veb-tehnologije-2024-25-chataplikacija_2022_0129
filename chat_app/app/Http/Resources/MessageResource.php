@@ -15,16 +15,8 @@ class MessageResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'content' => $this->content,
             'conversation_id' => $this->conversation_id,
-            'sender_name' => $this->sender->name,
-            'receiver_name' => $this->receiver->name,
-            'attachments' => $this->attachments->map(function ($attachment) {
-                return [
-                    'filename' => $attachment->name,
-                    'url' => $attachment->path,
-                ];
-            }),
+            'content' => $this->content,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

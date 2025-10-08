@@ -4,11 +4,6 @@ export interface Auth {
     user: User;
 }
 
-export interface BreadcrumbItem {
-    title: string;
-    href: string;
-}
-
 export interface NavGroup {
     title: string;
     items: NavItem[];
@@ -76,12 +71,13 @@ export interface User {
 
 export interface Message {
     id: number;
-    sender_id: number;
-    receiver_id: number;
+    sender: User;
+    receiver: User;
     conversation_id: number;
     content: string;
     created_at: string;
     updated_at: string;
+    attachments: Attachment[];
     [key: string]: unknown;
 }
 
@@ -92,5 +88,15 @@ export interface Conversation {
     updated_at: string;
     user1: User;
     user2: User;
+    [key: string]: unknown;
+}
+
+export interface Attachment {
+    id: number;
+    message_id: number;
+    name: string;
+    path: string;
+    mime: string;
+    size: number;
     [key: string]: unknown;
 }

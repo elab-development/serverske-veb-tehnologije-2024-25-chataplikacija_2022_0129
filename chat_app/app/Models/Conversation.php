@@ -36,7 +36,7 @@ class Conversation extends Model
             ->orWhere('user_id2', $user->id);
         });
 
-        if ($user->isAdmin()) {
+        if (!$user->isAdmin()) {
             $query->where(function ($q) use ($userId) {
                 $q->where(function ($subQ) use ($userId) {
                     $subQ->where('user_id1', $userId)

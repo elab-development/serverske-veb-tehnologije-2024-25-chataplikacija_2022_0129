@@ -1,7 +1,7 @@
 import { NavMain } from '../components/nav-main';
 import { NavUser } from '../components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../components/ui/sidebar';
-import { type Conversation, type NavItem } from '../types';
+import { UserAndConversation, type Conversation, type NavItem } from '../types';
 import { CircleUserRound, SquarePen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useConversations } from '../context/conversations-provider';
@@ -10,19 +10,31 @@ import { Input } from './ui/input';
 
 export function AppSidebar() {
     const { conversations, loading, error, getOtherUser } = useConversations();
-    const [localConversations, setLocalConversations] = useState<Conversation[]>(conversations);
-    const [sortedConversations, setSortedConversations] = useState<Conversation[]>([]);
+    const [localConversations, setLocalConversations] = useState<UserAndConversation[]>(conversations);
+    const [sortedConversations, setSortedConversations] = useState<UserAndConversation[]>([]);
     
     const [search, setSearch] = useState('');
     
     useEffect(() => {
         setSortedConversations(
             [...localConversations].sort((a, b) => {
-                if (a.updated_at && b.updated_at) {
-                    return b.updated_at.localeCompare(a.updated_at);
-                } else if (a.updated_at) {
+                if (a.user.is_blocked !== b.user.is_blocked) {
+                    return a.user.is_blocked ? 1 : -1;
+                }
+
+                if (!a.conversation && !b.conversation) {
+                    return 0;
+                } else if (!a.conversation) {
+                    return 1;
+                } else if (!b.conversation) {
                     return -1;
-                } else if (b.updated_at) {
+                }
+
+                if (a.conversation.updated_at && b.conversation.updated_at) {
+                    return b.conversation.updated_at.localeCompare(a.conversation.updated_at);
+                } else if (a.conversation.updated_at) {
+                    return -1;
+                } else if (b.conversation.updated_at) {
                     return 1;
                 } else {
                     return 0;
@@ -38,10 +50,14 @@ export function AppSidebar() {
 
     useEffect(() => {
         if (search) {
-            const filteredConversations = conversations.filter((conv) => conv.name.toLowerCase().includes(search.toLowerCase()) || getOtherUser(conv)?.name.toLowerCase().includes(search.toLowerCase()));
-            setSortedConversations(filteredConversations);
+            const filteredConversations = conversations.filter(
+                (conv) => 
+                    conv.conversation.name.toLowerCase().includes(search.toLowerCase()) || 
+                    conv.user.name.toLowerCase().includes(search.toLowerCase())
+                );
+            setLocalConversations(filteredConversations);
         } else {
-            setSortedConversations(conversations);
+            setLocalConversations(conversations);
         }
     }, [search, conversations]);
 

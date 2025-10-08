@@ -67,7 +67,7 @@ export default function Home() {
 
         try{
             setLoading(true);
-            const response = await api.get<Message[]>('/messages/by-conversation?conversation_id=' + selectedConversation.id);
+            const response = await api.get<Message[]>('/messages/by-conversation?conversation_id=' + selectedConversation.conversation.id);
             
             setMessages(response.data);
             setError(null);

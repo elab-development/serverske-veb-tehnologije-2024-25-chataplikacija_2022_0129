@@ -3,12 +3,8 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from './u
 import { UserInfo } from './user-info';
 import { UserMenuContent } from './user-menu-content';
 import { useIsMobile } from '../hooks/use-mobile';
-import { type SharedData } from '../types';
-//import { usePage } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
 import { useAuth } from '../context/auth-provider';
-
-
 
 export function NavUser() {
     const { user } = useAuth();

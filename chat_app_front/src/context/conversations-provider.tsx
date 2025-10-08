@@ -1,20 +1,20 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from './auth-provider';
 import api from '../api';
-import type { Conversation, User } from '../types';
+import type { Conversation, User, UserAndConversation } from '../types';
 
 interface ConversationsContextType {
-    conversations: Conversation[];
-    selectedConversation: Conversation | null;
+    conversations: UserAndConversation[];
+    selectedConversation: UserAndConversation | null;
     loading: boolean;
     error: string | null;
     //refetch: () => Promise<void>; za sad je ne koristim ali mislim da ce mi trebati kad budem sokete dodao
     addConversation: (conversation: Conversation) => void;
     updateConversation: (id: number, updates: Partial<Conversation>) => void;
     deleteConversation: (id: number) => void;
-    getOtherUser: (conversation: Conversation) => User | null;
-    getConversationById: (id: number) => Conversation | undefined;
-    selectConversation: (conversation: Conversation | null) => void;
+    getOtherUser: (conversation: UserAndConversation) => User | null;
+    getConversationById: (id: number) => UserAndConversation | undefined;
+    selectConversation: (conversation: UserAndConversation | null) => void;
     selectConversationById: (id: number) => void;
 }
 
@@ -22,8 +22,8 @@ const ConversationsContext = createContext<ConversationsContextType | undefined>
 
 export function ConversationsProvider({ children }: { children: ReactNode }) {
     const { user } = useAuth();
-    const [conversations, setConversations] = useState<Conversation[]>([]);
-    const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+    const [conversations, setConversations] = useState<UserAndConversation[]>([]);
+    const [selectedConversation, setSelectedConversation] = useState<UserAndConversation | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -35,8 +35,8 @@ export function ConversationsProvider({ children }: { children: ReactNode }) {
 
         try {
             setLoading(true);
-            const response = await api.get<Conversation[]>(
-                `/conversations/by-user?user_id=${user.id}`
+            const response = await api.get<UserAndConversation[]>(
+                `/users-with-conversations`
             );
 
             setConversations(response.data);
@@ -54,48 +54,37 @@ export function ConversationsProvider({ children }: { children: ReactNode }) {
     }, [user?.id]);
 
     const addConversation = (conversation: Conversation) => {
-        setConversations(prev => [conversation, ...prev]);
+        //setConversations(prev => [conversation, ...prev]);
     };
 
     const updateConversation = (id: number, updates: Partial<Conversation>) => {
-        setConversations(prev =>
+        /*setConversations(prev =>
             prev.map(conv => (conv.id === id ? { ...conv, ...updates } : conv))
         );
 
         if (selectedConversation?.id === id) {
             setSelectedConversation(prev => prev ? { ...prev, ...updates } : null);
-        }
+        }*/
     };
 
     const deleteConversation = (id: number) => {
-        setConversations(prev => prev.filter(conv => conv.id !== id));
+        /*setConversations(prev => prev.filter(conv => conv.id !== id));
         
         if (selectedConversation?.id === id) {
             setSelectedConversation(null);
-        }
+        }*/
     };
 
-    const getOtherUser = (conversation: Conversation): User | null => {
-        if(!user?.id) {
-            return null;
-        }
-
-        if (conversation.user_id1 === user.id) {
-            return conversation.user2 || null;
-        } else if (conversation.user_id2 === user.id) {
-            return conversation.user1 || null;
-        }
-
-        return null;
+    const getOtherUser = (conversation: UserAndConversation): User | null => {
+        return conversation.user;
     };
 
-    const getConversationById = (id: number): Conversation | undefined => {
-        return conversations.find(conv => conv.id === id);
+    const getConversationById = (id: number): UserAndConversation | undefined => {
+        return conversations.find(conv => conv.conversation.id === id);
     };
 
-    const selectConversation = (conversation: Conversation | null) => {
+    const selectConversation = (conversation: UserAndConversation | null) => {
         setSelectedConversation(conversation);
-        console.log('Selected conversation:', conversation);
     };
 
     const selectConversationById = (id: number) => {

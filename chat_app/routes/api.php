@@ -6,6 +6,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -13,8 +14,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'me']);
 
+    Route::get('/users-with-conversations', [UserController::class, 'getUsers']);
+
     Route::post('/send-message', [MessageController::class, 'sendMessage']);
-    Route::get('/conversations/by-user', [ConversationController::class, 'listByUser']);
+    //Route::get('/conversations/by-user', [ConversationController::class, 'listByUser']);
     Route::get('/conversations', [ConversationController::class, 'searchByName']);
     Route::put('/conversations', [ConversationController::class, 'update']);
 

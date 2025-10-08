@@ -100,3 +100,9 @@ export interface Attachment {
     size: number;
     [key: string]: unknown;
 }
+
+export interface UserAndConversation {
+    user: User;
+    conversation: Conversation;
+    [key: string]: unknown;
+}

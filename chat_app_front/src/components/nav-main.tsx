@@ -1,10 +1,11 @@
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from './ui/sidebar';
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from './ui/sidebar';
 import { Conversation, type NavItem } from '../types';
 import { Link, useLocation } from 'react-router-dom';
 import { useConversations } from '../context/conversations-provider';
 import { CircleUserRound } from 'lucide-react';
 
 export function NavMain({ items = [] }: { items: Conversation[] }) {
+    const { toggleSidebar } = useSidebar();
     const location = useLocation();
     const { getOtherUser } = useConversations();
 
@@ -20,7 +21,7 @@ export function NavMain({ items = [] }: { items: Conversation[] }) {
                             isActive={location.pathname.startsWith("/conversations/" + item.id)}
                             tooltip={{ children: item.id }}
                         >
-                            <Link to={`/conversations/${item.id}`} >
+                            <Link to={`/conversations/${item.id}`} onClick={toggleSidebar}>
                                 <CircleUserRound />
                                 <span>{item.name ? item.name : getOtherUser(item)?.name}</span>
                             </Link>

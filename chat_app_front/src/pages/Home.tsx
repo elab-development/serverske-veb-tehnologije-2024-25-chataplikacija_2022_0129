@@ -10,7 +10,12 @@ import { useParams } from 'react-router-dom';
 
 export default function Home() {
     const { conversationId } = useParams<{ conversationId?: string }>();
-    const { selectConversation,selectConversationById, selectedConversation } = useConversations();
+    const { 
+        selectConversation,
+        selectConversationById, 
+        selectedConversation,
+        conversations
+    } = useConversations();
 
     const [onlineUsers, setOnlineUsers] = useState<Record<number, User>>({});
     const isUserOnline = (userId: number) => Boolean(onlineUsers[userId]);
@@ -22,7 +27,7 @@ export default function Home() {
         else {
             selectConversation(null);
         }
-    }, [conversationId]);
+    }, [conversationId, conversations]);
 
     /*useEffect(() => {
         const channel = echo

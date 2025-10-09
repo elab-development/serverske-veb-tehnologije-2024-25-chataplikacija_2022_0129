@@ -16,11 +16,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/users-with-conversations', [UserController::class, 'getUsers']);
 
-    Route::post('/send-message', [MessageController::class, 'sendMessage']);
+    
     //Route::get('/conversations/by-user', [ConversationController::class, 'listByUser']);
     Route::get('/conversations', [ConversationController::class, 'searchByName']);
+    Route::post('/conversation', [ConversationController::class, 'store']);
     Route::put('/conversations', [ConversationController::class, 'update']);
-
+    
+    Route::post('/send-message', [MessageController::class, 'sendMessage']);
     Route::get('/messages/by-conversation', [MessageController::class, 'getMessagesByConversation']);
 });
 
@@ -29,6 +31,8 @@ Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
     Route::delete('/users/{user}/delete', [AdminController::class, 'deleteUser']);
     Route::put('/users/{user}/block', [AdminController::class, 'blockUser']);
     Route::put('/users/{user}/unblock', [AdminController::class, 'unblockUser']);
+    Route::put('/users/{user}/make-admin', [AdminController::class, 'makeUserAdmin']);
+
 
     Route::apiResource('/messages', MessageController::class);
     

@@ -64,4 +64,11 @@ class AdminController extends Controller
 
         return response()->json(['message' => 'User deleted successfully']);
     }
+
+    public function makeUserAdmin(Request $request, User $user)
+    {
+        $user->update(['is_admin' => true]);
+
+        return response()->json(['message' => 'User made admin successfully', 'user' => $user]);
+    }
 }

@@ -2,14 +2,15 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { useAuth } from './auth-provider';
 import api from '../api';
 import type { Conversation, User, UserAndConversation } from '../types';
+import { useNavigate } from 'react-router-dom';
 
 interface ConversationsContextType {
     conversations: UserAndConversation[];
     selectedConversation: UserAndConversation | null;
     loading: boolean;
     error: string | null;
-    //refetch: () => Promise<void>; za sad je ne koristim ali mislim da ce mi trebati kad budem sokete dodao
-    addConversation: (conversation: Conversation) => void;
+    refetch: () => Promise<void>; //za sad je ne koristim ali mislim da ce mi trebati kad budem sokete dodao
+    addConversation: (user: User) => Promise<void>;
     updateConversation: (id: number, updates: Partial<Conversation>) => void;
     deleteConversation: (id: number) => void;
     getOtherUser: (conversation: UserAndConversation) => User | null;
@@ -26,6 +27,8 @@ export function ConversationsProvider({ children }: { children: ReactNode }) {
     const [selectedConversation, setSelectedConversation] = useState<UserAndConversation | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const navigate = useNavigate();
 
     const fetchConversations = async () => {
         if (!user?.id) {
@@ -53,8 +56,17 @@ export function ConversationsProvider({ children }: { children: ReactNode }) {
         fetchConversations();
     }, [user?.id]);
 
-    const addConversation = (conversation: Conversation) => {
-        //setConversations(prev => [conversation, ...prev]);
+    const addConversation = async (user: User) => {
+        let newConversation = null;
+        try{
+            const response = await api.post<Conversation>('/conversation?user_id=' + user.id);
+            newConversation = response.data;
+        } catch (err: any) {
+            console.error('Error adding conversation:', err);
+        }
+
+        await fetchConversations();
+        navigate(`/conversations/${newConversation?.id}`);
     };
 
     const updateConversation = (id: number, updates: Partial<Conversation>) => {
@@ -97,7 +109,7 @@ export function ConversationsProvider({ children }: { children: ReactNode }) {
         selectedConversation,
         loading,
         error,
-        //refetch: fetchConversations,
+        refetch: fetchConversations,
         addConversation,
         updateConversation,
         deleteConversation,

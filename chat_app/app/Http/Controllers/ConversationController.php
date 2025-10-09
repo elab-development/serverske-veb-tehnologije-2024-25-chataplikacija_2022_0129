@@ -7,9 +7,30 @@ use App\Models\User;
 use App\Models\Conversation;
 use App\Http\Resources\ConversationResource;
 use Exception;
+use Carbon\Carbon;
 
 class ConversationController extends Controller
 {
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id'
+        ]);
+
+        $user1 = $request->user();
+        $user2 = User::findOrFail($validated['user_id']);
+
+        $conversation = Conversation::create([
+            'user_id1' => min($user1->id, $user2->id),
+            'user_id2' => max($user1->id, $user2->id),
+            'name' => null,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        return response()->json($conversation, 201);
+    }
+
     public function listByUser(Request $request){
         try {
             $request->validate([
@@ -55,16 +76,14 @@ public function update(Request $request, $id)
     return response()->json($conversation, 200);
 }
 
-public static function listByUserInternal(int $userId){
-  
-    
- 
-    return Conversation::where(function ($q) use ($userId) {
-        $q->where('user_id1', $userId)
-          ->orWhere('user_id2', $userId);
-    })->get();
+    public static function listByUserInternal(int $userId){
+        return Conversation::where(function ($q) use ($userId) {
+            $q->where('user_id1', $userId)
+            ->orWhere('user_id2', $userId);
+        })->get();
+    }
 
-       
-       
-}
+    public static function getMaxId(){
+        return Conversation::max('id');
+    }
 }

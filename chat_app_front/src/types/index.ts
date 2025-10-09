@@ -83,7 +83,7 @@ export interface Message {
 
 export interface Conversation {
     id: number;
-    name: string;
+    name: string | null;
     created_at: string;
     updated_at: string;
     user1: User;

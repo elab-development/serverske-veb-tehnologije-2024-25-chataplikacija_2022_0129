@@ -7,9 +7,11 @@ import { Link } from 'react-router-dom';
 import { useConversations } from '../context/conversations-provider';
 import { useEffect, useState } from 'react';
 import { Input } from './ui/input';
+import { useAuth } from '../context/auth-provider';
 
 export function AppSidebar() {
-    const { conversations, loading, error, getOtherUser } = useConversations();
+    const { user } = useAuth();
+    const { conversations, loading, error } = useConversations();
     const [localConversations, setLocalConversations] = useState<UserAndConversation[]>(conversations);
     const [sortedConversations, setSortedConversations] = useState<UserAndConversation[]>([]);
     
@@ -52,7 +54,7 @@ export function AppSidebar() {
         if (search) {
             const filteredConversations = conversations.filter(
                 (conv) => 
-                    conv.conversation.name.toLowerCase().includes(search.toLowerCase()) || 
+                    conv.conversation.name?.toLowerCase().includes(search.toLowerCase()) || 
                     conv.user.name.toLowerCase().includes(search.toLowerCase())
                 );
             setLocalConversations(filteredConversations);
@@ -78,7 +80,7 @@ export function AppSidebar() {
             <SidebarContent>
                 <SidebarGroupLabel style={{ justifyContent: "space-between"}}>
                     Conversations
-                    <SquarePen/> { /*NAPRAVI OD OVOGA BUTTON ZA DODAVANJE NOVE KONVERZACIJE*/}
+                    {!user?.is_admin && <SquarePen/>}{ /*NAPRAVI OD OVOGA BUTTON ZA DODAVANJE NOVE KONVERZACIJE*/}
                 </SidebarGroupLabel>
                 <Input
                     id="search"

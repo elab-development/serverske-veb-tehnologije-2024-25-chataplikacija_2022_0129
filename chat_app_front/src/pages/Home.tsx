@@ -74,6 +74,7 @@ export default function Home() {
         } catch (err: any) {
             console.error('Error fetching messages:', err);
             setError(err.message);
+            setMessages([]);
         } finally {
             setLoading(false);
         }

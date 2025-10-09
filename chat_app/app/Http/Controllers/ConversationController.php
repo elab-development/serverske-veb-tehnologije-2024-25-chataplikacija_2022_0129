@@ -61,19 +61,30 @@ public function searchByName(Request $request){
 
         return response()->json($conversations);
     }
-public function update(Request $request, $id)
+public function update(Request $request, $conversationId)
 {
-    $conversation = Conversation::findOrFail($id);
+    try{
+        $validated = $request->validate([
+            'name' => 'nullable|string|max:255'
+        ]);
 
-    $validated = $request->validate([
-        'name'     => 'nullable|string|max:255',
-        'user_id1' => 'sometimes|exists:users,id',
-        'user_id2' => 'sometimes|exists:users,id',
-    ]);
+        $conversation = Conversation::findOrFail($conversationId);
+        
+        $user = $request->user();
 
-    $conversation->update($validated);
+        if ($conversation->user_id1 !== $user->id && $conversation->user_id2 !== $user->id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
 
-    return response()->json($conversation, 200);
+        $conversation->update($validated);
+
+        return response()->json($conversation, 200);
+    } catch (Exception $e) {
+        return response()->json([
+            'error' => true,
+            'message' => $e->getMessage()
+        ], 500);
+    }
 }
 
     public static function listByUserInternal(int $userId){

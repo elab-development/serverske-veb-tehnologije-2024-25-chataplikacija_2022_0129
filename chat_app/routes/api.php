@@ -20,7 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     //Route::get('/conversations/by-user', [ConversationController::class, 'listByUser']);
     Route::get('/conversations', [ConversationController::class, 'searchByName']);
     Route::post('/conversation', [ConversationController::class, 'store']);
-    Route::put('/conversations', [ConversationController::class, 'update']);
+    Route::put('/conversations/{id}', [ConversationController::class, 'update']);
     
     Route::post('/send-message', [MessageController::class, 'sendMessage']);
     Route::get('/messages/by-conversation', [MessageController::class, 'getMessagesByConversation']);

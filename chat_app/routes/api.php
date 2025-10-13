@@ -21,7 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/conversations', [ConversationController::class, 'searchByName']);
     Route::post('/conversation', [ConversationController::class, 'store']);
     Route::put('/conversations/{id}', [ConversationController::class, 'update']);
-    
+    Route::post('/conversation/create', [MessageController::class, 'createConversation']);
     Route::post('/send-message', [MessageController::class, 'sendMessage']);
     Route::get('/messages/by-conversation', [MessageController::class, 'getMessagesByConversation']);
 });

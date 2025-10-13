@@ -56,18 +56,30 @@ export function ConversationsProvider({ children }: { children: ReactNode }) {
         fetchConversations();
     }, [user?.id]);
 
-    const addConversation = async (user: User) => {
-        let newConversation = null;
-        try{
-            const response = await api.post<Conversation>('/conversation?user_id=' + user.id);
-            newConversation = response.data;
-        } catch (err: any) {
-            console.error('Error adding conversation:', err);
-        }
+    const addConversation = async (targetEmail: string, creatorId: number) => {
+          
+    if (!targetEmail.trim()) return;
+    
 
-        await fetchConversations();
-        navigate(`/conversations/${newConversation?.id}`);
+    try {
+        const response = await api.post('/conversation/create', {
+            user_id1: creatorId,
+            user_email: targetEmail
+        });
+        console.log("Conversation created:", response.data);
+
+         const newConv: UserAndConversation = {
+      user: response.data.other_user,
+      conversation: response.data.conversation,
     };
+fetchConversations();
+    return newConv;
+         
+    } catch (err: any) {  
+        console.error('Error adding conversation:', err);
+            setError(err.message);
+    }
+};
 
     const updateConversation = (id: number, updates: Partial<Conversation>) => {
         /*setConversations(prev =>

@@ -5,21 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use App\Models\User;
 use App\Models\Conversation;
+use App\Http\Requests\StoreMessageRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class MessageController extends Controller
 {
-   
+    //api methods
     public function index()
-    {
-         
+    {    
         $messages = Message::with(['sender', 'receiver'])->get();
         return response()->json($messages);
     }
 
- 
     public function create()
     {
         return response()->json([
@@ -27,7 +26,6 @@ class MessageController extends Controller
         ]);
     }
 
- 
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -39,16 +37,16 @@ class MessageController extends Controller
 
         $message = Message::create($validated);
 
+        broadcast(new MessageSent($message))->toOthers();
+
         return response()->json($message, 201);
     }
 
- 
     public function show(Message $message)
     {
         return response()->json($message->load(['sender', 'receiver', 'conversation']));
     }
 
- 
     public function edit(Message $message)
     {
         return response()->json($message);
@@ -127,9 +125,36 @@ class MessageController extends Controller
             'content' => $request->content,
         ]);
 
+        broadcast(new MessageSent($message))->toOthers();
+
         return response()->json([
             'message' => 'Message sent successfully',
             'data' => $message,
         ], 201);
     }
+
+
+
+    //socket methods
+    public function byUser(User $user){
+        $messages = Message::where('sender_id', Auth::id())
+        ->where('receiver_id', $user->id)
+        ->orWhere('sender_id', $user->id)
+        ->where('receiver_id', Auth::id())
+        ->latest()
+        ->paginate(10)
+        ->get();
+        return $messages;
+    }
+
+    public function byConversation(Conversation $conversation){
+        
+    }
+
+    public function loadOlder(Message $message){
+        
+    }
+
+    //public function store(StoreMessageRequest $request){  
+    //}
 }

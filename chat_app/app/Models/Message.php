@@ -40,6 +40,7 @@ class Message extends Model
         return Message::where('conversation_id', $conversation->id)
         ->with(['sender', 'receiver', 'attachments'])
         ->orderBy('created_at', 'asc')
+        ->take(50)
         ->get();
     }
 }

@@ -1,8 +1,9 @@
 /*! tailwindcss v4.1.12 | MIT License | https://tailwindcss.com */
-/*@import "tailwindcss";
+@import "tailwindcss";
 /* Or if that doesn't work:
 @import "tailwindcss/preflight";
 @import "tailwindcss/utilities";*/
+@plugin "daisyui";
 
 @layer properties {
     @supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))) {

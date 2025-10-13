@@ -80,7 +80,7 @@ export function AppSidebar() {
             <SidebarContent>
                 <SidebarGroupLabel style={{ justifyContent: "space-between"}}>
                     Conversations
-                    {!user?.is_admin && <SquarePen/>}{ /*NAPRAVI OD OVOGA BUTTON ZA DODAVANJE NOVE KONVERZACIJE*/}
+                    {!user?.is_admin && <SquarePen/>}{ /*NAPRAVI OD OVOGA BUTTON ZA DODAVANJE NOVE KONVERZACIJE - dodati onClick za SquarePen koji poziva funkciju koja ce da otvori novu komponentu sa listom usera - u toj komponenti se bira user i za izabranog pokrece metoda addConversation iz conversations providera.tsx context-a, zatim zatvoriti tu komponentu (umesto komponente moze da se otvori i novi page preko navigate(/new-conversation) ali je elegantnije imati plutajucu komponentu za to) */}
                 </SidebarGroupLabel>
                 <Input
                     id="search"

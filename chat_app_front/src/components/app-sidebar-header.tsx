@@ -22,7 +22,7 @@ export function AppSidebarHeader() {
                     <h1 className="text-lg font-semibold">{selectedConversation?.user.name}</h1>
                 )}
             </div>
-            <EllipsisVertical></EllipsisVertical> {/* DROPDOWN MENI ZA IZMENU KONVERZACIJE*/}
+            <EllipsisVertical></EllipsisVertical> {/* DROPDOWN MENI ZA IZMENU KONVERZACIJE - slicno kao i za dodavanje konverzacije - da se otvori komponenta( ovde mozda moze da se iskoristi DropdownMenu iz @radix-ui - pogledati admin-options-dropdown da vidite kako se pravi - samo ce DropdownMenuTrigger biti ove tri tacke, a u DropdownMenuContent ce DropdownMenuItem biti neki input i dugme) na kojoj ima polje za upis imena konverzacije i dugme za potvrdu - kada se dugme pritisne poziva se metoda updateConversation iz conversations-provider.tsx context-a koju treba napisati (ona treba da poziva rutu api.put('/conversations/{conversationId}') i da ponovo fetchuje konverzacije - pogledati funkciju addConversation)*/}
         </header>
     );
 }

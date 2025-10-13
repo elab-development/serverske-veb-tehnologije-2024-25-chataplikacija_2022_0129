@@ -3,11 +3,23 @@ import { User } from '../types';
 import { useConversations } from '../context/conversations-provider';
 import { useEffect, useState } from 'react';
 import { EllipsisVertical } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from './ui/dialog';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
+  
 
 export function AppSidebarHeader() {
     const { isMobile } = useSidebar();
-    const { selectedConversation } = useConversations();
-
+    const { selectedConversation, deleteConversation, updateConversation  } = useConversations();
+     const [isRenameOpen, setIsRenameOpen] = useState(false);
+     const [newName, setNewName] = useState(''); //new name for convo
+    const handleRename = () =>{}
     useEffect(() => {
         if (!selectedConversation) return;
     }, [selectedConversation]);
@@ -22,7 +34,46 @@ export function AppSidebarHeader() {
                     <h1 className="text-lg font-semibold">{selectedConversation?.user.name}</h1>
                 )}
             </div>
-            <EllipsisVertical></EllipsisVertical> {/* DROPDOWN MENI ZA IZMENU KONVERZACIJE*/}
+           <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <button className="p-2 hover:bg-muted rounded-full transition">
+                        <EllipsisVertical className="h-5 w-5" />
+                    </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                    <DropdownMenuItem onClick={() => setIsRenameOpen(true)}>
+                        Rename
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                        onClick={()=>deleteConversation((selectedConversation)? selectedConversation.conversation.id:-1)}
+                        className="text-red-500 focus:text-red-500"
+                    >
+                        Delete
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+            <Dialog open={isRenameOpen} onOpenChange={setIsRenameOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Rename Conversation</DialogTitle>
+                    </DialogHeader>
+                    <Input
+                        placeholder="Enter new name..."
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                    />
+                    <DialogFooter>
+                        <Button variant="ghost" onClick={() => setIsRenameOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button onClick={() => {
+    if (!selectedConversation) return;
+    updateConversation(selectedConversation.conversation.id, { name: newName });
+    setIsRenameOpen(false);
+}}>Save</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </header>
     );
 }

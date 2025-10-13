@@ -10,7 +10,7 @@ interface ConversationsContextType {
     loading: boolean;
     error: string | null;
     refetch: () => Promise<void>; //za sad je ne koristim ali mislim da ce mi trebati kad budem sokete dodao
-    addConversation: (user: User) => Promise<void>;
+    addConversation: (targetEmail: string, creatorId: number) => Promise<void>;
     updateConversation: (id: number, updates: Partial<Conversation>) => void;
     deleteConversation: (id: number) => void;
     getOtherUser: (conversation: UserAndConversation) => User | null;
@@ -81,23 +81,35 @@ fetchConversations();
     }
 };
 
-    const updateConversation = (id: number, updates: Partial<Conversation>) => {
-        /*setConversations(prev =>
-            prev.map(conv => (conv.id === id ? { ...conv, ...updates } : conv))
-        );
+    const updateConversation = async (id: number, updates: Partial<Conversation>) => {
+    try {
+        const response = await api.put<Conversation>(`/conversations/${id}`, updates);
+        fetchConversations();
+        return response.data; 
+    } catch (error: any) {
+        console.error('Failed to update conversation:', error);
+        throw error;
+    }
+};
 
-        if (selectedConversation?.id === id) {
-            setSelectedConversation(prev => prev ? { ...prev, ...updates } : null);
-        }*/
-    };
-
-    const deleteConversation = (id: number) => {
-        /*setConversations(prev => prev.filter(conv => conv.id !== id));
+  const deleteConversation = async (id: number) => {
+    try {
+         
+     const response =   await api.delete(`/conversations/${id}`);
+           if (response.data?.error) {
+            throw new Error(response.data.error);
+        }
+         
+      //  setConversations(prev => prev.filter(conv => conv.conversation.id !== id));
+fetchConversations();
         
-        if (selectedConversation?.id === id) {
+        if (selectedConversation?.conversation.id === id) {
             setSelectedConversation(null);
-        }*/
-    };
+        }
+    } catch (error:any) {
+        console.error('Failed to delete conversation:', error);
+    }
+};
 
     const getOtherUser = (conversation: UserAndConversation): User | null => {
         return conversation.user;

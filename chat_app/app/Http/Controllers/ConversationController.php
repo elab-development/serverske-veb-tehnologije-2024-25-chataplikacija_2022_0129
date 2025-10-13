@@ -11,6 +11,34 @@ use Carbon\Carbon;
 
 class ConversationController extends Controller
 {
+
+    public function createConversation(Request $request){
+
+ $request->validate([
+        'user_id1' => 'required|integer|exists:users,id',
+        'user_email' => 'required|email|exists:users,email',
+    ]);
+
+     
+    $user1 = User::find($request->user_id1);
+    $user2 = User::where('email', $request->user_email)->first();
+
+    if (!$user1 || !$user2) {
+        return response()->json(['error' => 'User not found.'], 404);
+    }
+     
+    $conversation = Conversation::create([
+        'name' => $user1->name . ' & ' . $user2->name,
+        'user_id1' => $user1->id,
+        'user_id2' => $user2->id,
+    ]);
+
+    return response()->json([
+     'conversation' => $conversation,
+    'other_user' => $user2
+    ], 201);
+
+    }
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -97,4 +125,18 @@ public function update(Request $request, $conversationId)
     public static function getMaxId(){
         return Conversation::max('id');
     }
+
+    public function destroy($id)
+{
+    $conversation = Conversation::find($id);
+
+    if (!$conversation) {
+        return response()->json(['error' => 'Conversation not found'], 404);
+    }
+
+    $conversation->delete();
+
+    return response()->json(['message' => 'Conversation deleted successfully'], 200);
+}
+
 }

@@ -15,13 +15,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'me']);
 
     Route::get('/users-with-conversations', [UserController::class, 'getUsers']);
+    Route::delete('/conversations/{id}', [ConversationController::class, 'destroy']);
 
     
     //Route::get('/conversations/by-user', [ConversationController::class, 'listByUser']);
     Route::get('/conversations', [ConversationController::class, 'searchByName']);
     Route::post('/conversation', [ConversationController::class, 'store']);
     Route::put('/conversations/{id}', [ConversationController::class, 'update']);
-    Route::post('/conversation/create', [MessageController::class, 'createConversation']);
+    Route::post('/conversation/create', [ConversationController::class, 'createConversation']);
     Route::post('/send-message', [MessageController::class, 'sendMessage']);
     Route::get('/messages/by-conversation', [MessageController::class, 'getMessagesByConversation']);
 });

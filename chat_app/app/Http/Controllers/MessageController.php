@@ -8,6 +8,8 @@ use App\Models\Conversation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
+
 
 class MessageController extends Controller
 {
@@ -91,34 +93,83 @@ class MessageController extends Controller
             ], 500);
         }
     }
+/*
+Primer:
+{ 
+  "text": "Hello, how are you today?"
+}
+  Odgovor:
+{
+  {
+    "id": "chatcmpl-CQXDrS0ECfhb7VhC8ldCOZiv7ZsY2",
+    "object": "chat.completion",
+    "created": 1760440271,
+    "model": "gpt-4.1-2025-04-14",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "Zdravo, kako si?",
+                "refusal": null,
+                "annotations": []
+            },
+            "logprobs": null,
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 33,
+        "completion_tokens": 7,
+        "total_tokens": 40,
+        "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+            "reasoning_tokens": 0,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+        }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_e24a1fec47"
+}
+}
+Posle obrade f-je: 
+{
+    "translated": "Zdravo, kako si?"
+}
+*/
+ public function translate(Request $request){
+    $text = $request->input('text');
 
-public function createConversation(Request $request){
-
- $request->validate([
-        'user_id1' => 'required|integer|exists:users,id',
-        'user_email' => 'required|email|exists:users,email',
+    $response = Http::withHeaders([
+        'Authorization' => 'Bearer ' . env('OPENAI_API_KEY'),
+        'Content-Type' => 'application/json',
+    ])->post('https://api.openai.com/v1/chat/completions', [
+        'model' => 'gpt-4.1',
+        'messages' => [
+            [
+                'role' => 'system',
+                'content' => 'You are a translator that translates everything into Serbian.',
+            ],
+            [
+                'role' => 'user',
+                'content' => "Translate the following text to Serbian: {$text}",
+            ],
+        ],
     ]);
 
-     
-    $user1 = User::find($request->user_id1);
-    $user2 = User::where('email', $request->user_email)->first();
-
-    if (!$user1 || !$user2) {
-        return response()->json(['error' => 'User not found.'], 404);
-    }
-     
-    $conversation = Conversation::create([
-        'name' => $user1->name . ' & ' . $user2->name,
-        'user_id1' => $user1->id,
-        'user_id2' => $user2->id,
-    ]);
+     $content = $response->json('choices.0.message.content');
 
     return response()->json([
-     'conversation' => $conversation,
-    'other_user' => $user2
-    ], 201);
+        'translated' => $content,
+    ]);
 
-    }
+    
+ }
 
     public function sendMessage(Request $request){
         

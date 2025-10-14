@@ -10,10 +10,11 @@ use App\Http\Controllers\UserController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/messages/translate', [MessageController::class, 'translate']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'me']);
-
+    
     Route::get('/users-with-conversations', [UserController::class, 'getUsers']);
     Route::delete('/conversations/{id}', [ConversationController::class, 'destroy']);
 
@@ -33,7 +34,7 @@ Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
     Route::put('/users/{user}/block', [AdminController::class, 'blockUser']);
     Route::put('/users/{user}/unblock', [AdminController::class, 'unblockUser']);
     Route::put('/users/{user}/make-admin', [AdminController::class, 'makeUserAdmin']);
-
+    
 
     Route::apiResource('/messages', MessageController::class);
     

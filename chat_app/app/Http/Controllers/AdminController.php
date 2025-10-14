@@ -43,15 +43,32 @@ class AdminController extends Controller
         }
 
         $user->update(['is_blocked' => true]);
-
-        return response()->json(['message' => 'User blocked successfully', 'user' => $user]);
+        $safeUser = [
+        'id' => $user->id,
+        'name' => htmlspecialchars($user->name, ENT_QUOTES, 'UTF-8'),
+        'email' => htmlspecialchars($user->email, ENT_QUOTES, 'UTF-8'),
+        'is_admin' => $user->is_admin,
+        'is_blocked' => $user->is_blocked,
+        'created_at' => $user->created_at,
+        'updated_at' => $user->updated_at,
+        ];
+        return response()->json(['message' => 'User blocked successfully', 'user' => $safeUser]);
     }
 
     public function unblockUser(Request $request, User $user)
     {
         $user->update(['is_blocked' => false]);
 
-        return response()->json(['message' => 'User unblocked successfully', 'user' => $user]);
+         $safeUser = [
+        'id' => $user->id,
+        'name' => htmlspecialchars($user->name, ENT_QUOTES, 'UTF-8'),
+        'email' => htmlspecialchars($user->email, ENT_QUOTES, 'UTF-8'),
+        'is_admin' => $user->is_admin,
+        'is_blocked' => $user->is_blocked,
+        'created_at' => $user->created_at,
+        'updated_at' => $user->updated_at,
+        ];
+        return response()->json(['message' => 'User unblocked successfully', 'user' => $safeUser]);
     }
 
     public function deleteUser(Request $request, User $user)
@@ -69,6 +86,16 @@ class AdminController extends Controller
     {
         $user->update(['is_admin' => true]);
 
-        return response()->json(['message' => 'User made admin successfully', 'user' => $user]);
+          $safeUser = [
+        'id' => $user->id,
+        'name' => htmlspecialchars($user->name, ENT_QUOTES, 'UTF-8'),
+        'email' => htmlspecialchars($user->email, ENT_QUOTES, 'UTF-8'),
+        'is_admin' => $user->is_admin,
+        'is_blocked' => $user->is_blocked,
+        'created_at' => $user->created_at,
+        'updated_at' => $user->updated_at,
+        ];
+       
+        return response()->json(['message' => 'User made admin successfully', 'user' => $safeUser]);
     }
 }

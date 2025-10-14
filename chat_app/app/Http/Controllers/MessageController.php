@@ -39,6 +39,12 @@ class MessageController extends Controller
             'content' => 'nullable|string',
         ]);
 
+        //xss zastita!
+
+        if (!empty($validated['content'])) {
+            $validated['content'] = htmlspecialchars(strip_tags($validated['content']));
+        }
+
         $message = Message::create($validated);
 
         return response()->json($message, 201);
@@ -64,6 +70,11 @@ class MessageController extends Controller
             'receiver_id' => 'nullable|exists:users,id',
             'conversation_id' => 'nullable|exists:conversations,id',
         ]);
+
+           //xss zastita!
+        if (!empty($validated['content'])) {
+            $validated['content'] = htmlspecialchars(strip_tags($validated['content']));
+        }
 
         $message->update($validated);
 
@@ -198,6 +209,8 @@ Posle obrade f-je:
                 'updated_at' => Carbon::now(),
             ]);
         }
+        //xss zastita
+        $content = $request->content ? htmlspecialchars(strip_tags($request->content)) : null;
 
         $message = Message::create([
             'sender_id' => $sender_id,

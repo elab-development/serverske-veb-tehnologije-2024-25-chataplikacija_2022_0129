@@ -11,6 +11,14 @@ use Carbon\Carbon;
 
 class ConversationController extends Controller
 {
+       private function xssProtect($value)
+    {
+        if (is_string($value)) {
+            
+            return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+        }
+        return $value;
+    }
 
     public function createConversation(Request $request){
 
@@ -28,7 +36,7 @@ class ConversationController extends Controller
     }
      
     $conversation = Conversation::create([
-        'name' => $user1->name . ' & ' . $user2->name,
+         'name' => $this->xssProtect($user1->name) . ' & ' . $this->xssProtect($user2->name),
         'user_id1' => $user1->id,
         'user_id2' => $user2->id,
     ]);
@@ -67,8 +75,11 @@ class ConversationController extends Controller
 
             $userId = $request->user_id;
             $conversations = Conversation::getAllForUser(User::find($userId));
-            
-            return response()->json($conversations);
+            $sanitized = $conversations->map(function ($conv) {
+                $conv->name = $this->xssProtect($conv->name);
+                return $conv;
+            });
+            return response()->json($sanitized);
         } catch (Exception $e) {
             return response()->json([
                 'error' => true,
@@ -87,7 +98,12 @@ public function searchByName(Request $request){
 
         $conversations = Conversation::where('name', 'like', "%{$name}%")->get();
 
-        return response()->json($conversations);
+         $sanitized = $conversations->map(function ($conv) {
+            $conv->name = $this->xssProtect($conv->name);
+            return $conv;
+        });
+
+        return response()->json($sanitized);
     }
 public function update(Request $request, $conversationId)
 {
@@ -103,7 +119,9 @@ public function update(Request $request, $conversationId)
         if ($conversation->user_id1 !== $user->id && $conversation->user_id2 !== $user->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-
+        if (isset($validated['name'])) {
+                $validated['name'] = $this->xssProtect($validated['name']); 
+            }
         $conversation->update($validated);
 
         return response()->json($conversation, 200);

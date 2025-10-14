@@ -10,16 +10,6 @@ use Carbon\Carbon;
 
 class AuthController extends Controller
 {
-
-     private function xssProtect($value)
-    {
-        if (is_string($value)) {
-            
-            return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-        }
-        return $value;
-    }
-
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -32,9 +22,6 @@ class AuthController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $name = htmlspecialchars($request->name, ENT_QUOTES, 'UTF-8');
-        $email = htmlspecialchars($request->email, ENT_QUOTES, 'UTF-8');
-        
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -85,18 +72,9 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('auth_token', ['*'], $expiresAt)->plainTextToken;
-        $safeUser = [
-        'id' => $user->id,
-        'name' => htmlspecialchars($user->name, ENT_QUOTES, 'UTF-8'),
-        'email' => htmlspecialchars($user->email, ENT_QUOTES, 'UTF-8'),
-        'is_admin' => $user->is_admin,
-        'is_blocked' => $user->is_blocked,
-        'created_at' => $user->created_at,
-        'updated_at' => $user->updated_at,
-        ];
 
         return response()->json([
-            'user' => $safeUser,
+            'user' => $user,
             'token' => $token,
             'expires_at' => $expiresAt->toIso8601String(),
         ]);
@@ -112,14 +90,6 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         \Log::info('user type', ['user' => $request->user()]);
-           return response()->json([
-        'id' => $user->id,
-        'name' => htmlspecialchars($user->name, ENT_QUOTES, 'UTF-8'),
-        'email' => htmlspecialchars($user->email, ENT_QUOTES, 'UTF-8'),
-        'is_admin' => $user->is_admin,
-        'is_blocked' => $user->is_blocked,
-        'created_at' => $user->created_at,
-        'updated_at' => $user->updated_at,
-    ]);
+        return response()->json($request->user());
     }
 }

@@ -7,16 +7,6 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-
-    private function xssProtect($value)
-    {
-        if (is_string($value)) {
-            
-            return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-        }
-        return $value;
-    }
-
     public function getUsers(Request $request){
         try {
             $data = User::getUsersWithConversations($request->user());
@@ -26,8 +16,8 @@ class UserController extends Controller
                     return [
                         'user' => [
                             'id' => $item->id,
-                            'name' => $this->xssProtect($item->name),
-                            'email' => $this->xssProtect($item->name),
+                            'name' => $item->name,
+                            'email' => $item->email,
                             'password' => $item->password,
                             'is_admin' => $item->is_admin,
                             'is_blocked' => $item->is_blocked,
@@ -36,7 +26,7 @@ class UserController extends Controller
                         ],
                         'conversation' => $item->conversation_id ? [
                             'id' => $item->conversation_id,
-                            'name' => $this->xssProtect($item->conversation_name),
+                            'name' => $item->conversation_name,
                             'user_id1' => $item->user_id1,
                             'user_id2' => $item->user_id2,
                             'created_at' => $item->conversation_created_at,

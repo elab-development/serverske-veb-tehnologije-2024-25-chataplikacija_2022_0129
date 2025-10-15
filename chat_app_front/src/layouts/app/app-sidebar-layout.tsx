@@ -8,9 +8,11 @@ export default function AppSidebarLayout({ children }: PropsWithChildren) {
     return (
         <AppShell variant="sidebar">
             <AppSidebar/>
-            <AppContent variant="sidebar" className="overflow-x-hidden">
+            <AppContent variant="sidebar" className="overflow-x-hidden h-screen flex flex-col">
                 <AppSidebarHeader />
-                {children}
+                <div className="flex-1 overflow-hidden">
+                    {children}
+                </div>
             </AppContent>
         </AppShell>
     );

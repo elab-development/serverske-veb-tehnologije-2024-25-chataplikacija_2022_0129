@@ -6,6 +6,8 @@ import { ProtectedRoute } from './routes/protected-route'
 import Register from './pages/auth/register'
 import { AuthProvider } from './context/auth-provider'
 import { ConversationsProvider } from './context/conversations-provider'
+import { IsUserOnlineProvider } from './context/is-user-online-provider'
+import { Toaster } from 'react-hot-toast'
 
 function App() {
 
@@ -14,6 +16,7 @@ function App() {
       <BrowserRouter>
         <AuthProvider>
           <ConversationsProvider>
+            <IsUserOnlineProvider>
             <Routes>
               <Route path="/" element={
                 <ProtectedRoute>
@@ -30,9 +33,11 @@ function App() {
                 <Home />
               } />
             </Routes>
+            </IsUserOnlineProvider>
           </ConversationsProvider>
         </AuthProvider>
       </BrowserRouter>
+      <Toaster/>
     </>
   )
 }

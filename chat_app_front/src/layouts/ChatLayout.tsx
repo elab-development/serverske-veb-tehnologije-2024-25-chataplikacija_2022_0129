@@ -4,10 +4,12 @@ import { useConversations } from '../context/conversations-provider';
 import api from '../api';
 import { useAuth } from '../context/auth-provider';
 import echo from '../echo';
+import MessageComponent from '../components/message';
+import SendMessageForm from '../components/send-message-form';
 
 export default function ChatLayout() {
     const { user } = useAuth();
-    const {selectedConversation, getOtherUser} = useConversations();
+    const {selectedConversation, refetch} = useConversations();
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(true);
@@ -17,6 +19,10 @@ export default function ChatLayout() {
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
     const fetchMessages = async () => {
         if (!selectedConversation) {
@@ -30,7 +36,6 @@ export default function ChatLayout() {
             
             setMessages(response.data);
             setError(null);
-            scrollToBottom();
         } catch (err: any) {
             console.error('Error fetching messages:', err);
             setError(err.message);
@@ -51,12 +56,10 @@ export default function ChatLayout() {
             return;
         }
 
-        console.log(selectedConversation?.conversation.id);
         const channel = echo.join(`conversation.${selectedConversation?.conversation.id}`);
 
         channel.listen('.message.sent', (message: Message) => {
             setMessages((prevMessages) => [...prevMessages, message]);
-            scrollToBottom();
         });
 
         return () => {
@@ -78,11 +81,10 @@ export default function ChatLayout() {
         setLoading(true);
 
         try{
-            const response = await api.post<Message>('/send-message?receiver_id=' + selectedConversation.user.id + '&content=' + newMessage);
+            await api.post<Message>('/send-message?receiver_id=' + selectedConversation.user.id + '&content=' + newMessage);
 
-            setMessages((prevMessages) => [...prevMessages, response.data]);
             setNewMessage('');
-            scrollToBottom();
+            await refetch();
         } catch (err: any) {
             console.error('Error sending message:', err);
             alert("Greska pri slanju poruke: " + err.message);
@@ -92,29 +94,20 @@ export default function ChatLayout() {
         }
     };
 
-    const formatTime = (timestamp: string) => {
-        return new Date(timestamp).toLocaleTimeString('sr-RS', {
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-    }
-
     return (
-        <div className="flex flex-col flex-1 overflow-hidden p-2">
-            {loading && <div>Loading...</div>}
+        <div className="flex flex-col h-full p-2">
+            {loading && <div><span className="loading loading-dots loading-lg"></span></div>}
             {error && <div>{error}</div>}
             {messages.length === 0 && !loading && <div>No messages yet</div>}
-            {messages.map((message, index) => (
-                <div key={index} className={`chat chat-${message.sender.id === user?.id ? 'end' : 'start'}`}>
-                    <div className="chat-header">
-                        {message.sender.name}
-                        <time className="text-xs opacity-50">{formatTime(message.created_at)}</time>
-                    </div>
-                    <div className="chat-bubble chat-bubble-info p-4 mb-2 max-w-150">
-                        {message.content}
-                    </div>
-                </div>
-            ))}
+
+            <div className="flex-1 overflow-y-auto min-h-0">
+                {messages.map((message, index) => (
+                    <MessageComponent key={index} message={message} />
+                ))}
+                <div ref={messagesEndRef} />
+            </div>
+            
+            <SendMessageForm newMessage={newMessage} setNewMessage={setNewMessage} onSendMessage={sendMessage} loading={loading} />
         </div>
     );
 }

@@ -26,9 +26,14 @@ class MessageSent implements ShouldBroadcastNow
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
-    public function broadcastOn(): Channel
+    public function broadcastOn(): array
     {
-        return new PresenceChannel('conversation.' . $this->message->conversation_id);
+        $channels = [];
+
+        $channels[] = new PresenceChannel('conversation.' . $this->message->conversation_id);
+        $channels[] = new PrivateChannel('user.' . $this->message->receiver_id);
+
+        return $channels;
     }
 
     public function broadcastAs(): string
@@ -40,11 +45,12 @@ class MessageSent implements ShouldBroadcastNow
     {
         return [
             'id' => $this->message->id,
-            'sender_id' => $this->message->sender_id,
-            'receiver_id' => $this->message->receiver_id,
+            'sender' => $this->message->sender,
+            'receiver' => $this->message->receiver,
             'conversation_id' => $this->message->conversation_id,
             'content' => $this->message->content,
-            'created_at' => $this->message->created_at
+            'created_at' => $this->message->created_at,
+            'updated_at' => $this->message->updated_at
         ];
     }
 }

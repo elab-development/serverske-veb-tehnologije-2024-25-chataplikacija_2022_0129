@@ -8,6 +8,7 @@ import { useConversations } from '../context/conversations-provider';
 import { useEffect, useState } from 'react';
 import { Input } from './ui/input';
 import { useAuth } from '../context/auth-provider';
+import { IsUserOnlineProvider } from '../context/is-user-online-provider';
 
 export function AppSidebar() {
     const { user } = useAuth();

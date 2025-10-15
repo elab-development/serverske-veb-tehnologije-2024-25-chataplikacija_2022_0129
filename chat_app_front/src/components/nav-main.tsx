@@ -11,6 +11,8 @@ import { Avatar, AvatarFallback } from './ui/avatar';
 import { useInitials } from '../hooks/use-initials';
 import { useEffect, useState } from 'react';
 import echo from '../echo';
+import { useNotifications } from '../hooks/use-notifications';
+import { useIsUserOnline } from '../context/is-user-online-provider';
 
 export function NavMain({ items = [] }: { items: UserAndConversation[] }) {
     const { user } = useAuth();
@@ -19,8 +21,7 @@ export function NavMain({ items = [] }: { items: UserAndConversation[] }) {
     const navigate = useNavigate();
     const { addConversation } = useConversations();
     const getInitials = useInitials();
-    const [onlineUsers, setOnlineUsers] = useState<Record<number, User>>({});
-    const isUserOnline = (userId: number) => Boolean(onlineUsers[userId]);
+    const { isUserOnline } = useIsUserOnline();
 
     const handleLinkClick = (item: UserAndConversation) => {
         toggleSidebar();
@@ -31,32 +32,6 @@ export function NavMain({ items = [] }: { items: UserAndConversation[] }) {
             navigate(`/conversations/${item.conversation.id}`);
         }
     };
-
-    useEffect(() => {
-        const channel = echo
-            .join('online')
-            .here((users: User[]) => {
-                const onlineUsersObj: Record<number, User> = Object.fromEntries(users.map((user) => [user.id, user]));
-                setOnlineUsers(onlineUsersObj);
-            })
-            .joining((user: User) => {
-                setOnlineUsers((prev) => ({ ...prev, [user.id]: user }));
-            })
-            .leaving((user: User) => {
-                setOnlineUsers((prev) => {
-                    const updated = { ...prev };
-                    delete updated[user.id];
-                    return updated;
-                });
-            })
-            .error((error: any) => {
-                console.error('error', error);
-            });
-
-        return () => {
-            echo.leave('online');
-        };
-    }, []);
 
     return (
         <SidebarGroup className="px-2 py-0">
@@ -94,7 +69,6 @@ export function NavMain({ items = [] }: { items: UserAndConversation[] }) {
                                     {item.user.is_blocked ? <Lock /> : null}
                                 </span>
                             )}
-                            
                         </SidebarMenuButton>
                         {user?.is_admin ? (
                             <AdminOptionsDropdown user={item.user}/>

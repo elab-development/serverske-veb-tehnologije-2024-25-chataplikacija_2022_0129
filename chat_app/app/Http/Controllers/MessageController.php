@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use App\Models\User;
 use App\Models\Conversation;
+use App\Events\MessageSent;
 use App\Http\Requests\StoreMessageRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -118,19 +119,20 @@ class MessageController extends Controller
             ]);
         }
 
-        $message = Message::create([
+        $newMessage = Message::create([
             'sender_id' => $sender_id,
             'receiver_id' => $receiver_id,
             'conversation_id' => $conversation->id,
             'content' => $request->content,
         ]);
 
+        Conversation::where('id', $conversation->id)->update(['updated_at' => Carbon::now()]);
+
+        $message = Message::with(['sender', 'receiver'])->find($newMessage->id);
+
         broadcast(new MessageSent($message))->toOthers();
 
-        return response()->json([
-            'message' => 'Message sent successfully',
-            'data' => $message,
-        ], 201);
+        return response()->json($message, 201);
     }
 
 

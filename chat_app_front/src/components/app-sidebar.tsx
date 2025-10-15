@@ -11,8 +11,12 @@ import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from './ui/dialog';
 
 import { useAuth } from '../context/auth-provider';
+<<<<<<< HEAD
 import api from '../api'
 
+=======
+import { IsUserOnlineProvider } from '../context/is-user-online-provider';
+>>>>>>> noviBranch
 
 export function AppSidebar() {
     const { user } = useAuth();
@@ -108,6 +112,7 @@ const handleCreateConversation = async () => {
             <SidebarContent>
                 <SidebarGroupLabel style={{ justifyContent: "space-between"}}>
                     Conversations
+<<<<<<< HEAD
                     {!user?.is_admin && (
                         <Dialog open={open} onOpenChange={setOpen}>
                             <DialogTrigger asChild>
@@ -136,6 +141,9 @@ const handleCreateConversation = async () => {
     </div>
 )}
 
+=======
+                    {!user?.is_admin && <SquarePen/>}{ /*NAPRAVI OD OVOGA BUTTON ZA DODAVANJE NOVE KONVERZACIJE - dodati onClick za SquarePen koji poziva funkciju koja ce da otvori novu komponentu sa listom usera - u toj komponenti se bira user i za izabranog pokrece metoda addConversation iz conversations providera.tsx context-a, zatim zatvoriti tu komponentu (umesto komponente moze da se otvori i novi page preko navigate(/new-conversation) ali je elegantnije imati plutajucu komponentu za to) */}
+>>>>>>> noviBranch
                 </SidebarGroupLabel>
                 <Input
                     id="search"

@@ -66,6 +66,7 @@ export interface User {
     is_blocked: boolean;
     created_at: string;
     updated_at: string;
+    is_online: boolean;
     [key: string]: unknown;
 }
 

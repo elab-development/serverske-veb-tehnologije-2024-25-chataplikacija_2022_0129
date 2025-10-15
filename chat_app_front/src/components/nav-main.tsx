@@ -7,6 +7,12 @@ import { useAuth } from '../context/auth-provider';
 import { Separator } from '@radix-ui/react-separator';
 import clsx from 'clsx';
 import AdminOptionsDropdown from './admin-options-dropdown';
+import { Avatar, AvatarFallback } from './ui/avatar';
+import { useInitials } from '../hooks/use-initials';
+import { useEffect, useState } from 'react';
+import echo from '../echo';
+import { useNotifications } from '../hooks/use-notifications';
+import { useIsUserOnline } from '../context/is-user-online-provider';
 
 export function NavMain({ items = [] }: { items: UserAndConversation[] }) {
     const { user } = useAuth();
@@ -14,6 +20,8 @@ export function NavMain({ items = [] }: { items: UserAndConversation[] }) {
     const location = useLocation();
     const navigate = useNavigate();
     const { addConversation } = useConversations();
+    const getInitials = useInitials();
+    const { isUserOnline } = useIsUserOnline();
 
     const handleLinkClick = (item: UserAndConversation) => {
         toggleSidebar();
@@ -42,18 +50,25 @@ export function NavMain({ items = [] }: { items: UserAndConversation[] }) {
                         >
                             {!item.user.is_blocked ? (
                                 <button onClick={() => handleLinkClick(item)} style={{ cursor: 'pointer'}}>
-                                    <CircleUserRound />
-                                    <span>{item.conversation?.name ? item.conversation.name : item.user.name}</span>
+                                    <div className={`avatar avatar-${isUserOnline(item.user.id) ? 'online' : 'offline'} avatar-placeholder`}>
+                                        <div className="rounded-full bg-neutral text-neutral-content w-8 dark:bg-neutral-300 dark:text-black">
+                                            <span>{getInitials(item.user.name)}</span>
+                                        </div>
+                                    </div>
+                                    <span className="font-small truncate dark:text-white">{item.conversation?.name ? item.conversation.name : item.user.name}</span>
                                     {item.user.is_admin ? <ShieldUser /> : null}
                                 </button>
                             ) : (
                                 <span onClick={toggleSidebar}>
-                                    <CircleUserRound />
+                                    <div className={`avatar avatar-${isUserOnline(item.user.id) ? 'online' : 'offline'} avatar-placeholder`}>
+                                        <div className="rounded-full bg-neutral text-neutral-content w-8 dark:bg-neutral-300 dark:text-black">
+                                            <span>{getInitials(item.user.name)}</span>
+                                        </div>
+                                    </div>
                                     <span>{item.user.name}</span>
                                     {item.user.is_blocked ? <Lock /> : null}
                                 </span>
                             )}
-                            
                         </SidebarMenuButton>
                         {user?.is_admin ? (
                             <AdminOptionsDropdown user={item.user}/>

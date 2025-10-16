@@ -3,6 +3,7 @@ import { useAuth } from './auth-provider';
 import api from '../api';
 import type { Conversation, User, UserAndConversation } from '../types';
 import { useNavigate } from 'react-router-dom';
+import echo from '../echo';
 
 interface ConversationsContextType {
     conversations: UserAndConversation[];

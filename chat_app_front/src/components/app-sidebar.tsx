@@ -11,6 +11,7 @@ import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from './ui/dialog';
 
 import { useAuth } from '../context/auth-provider';
+import { IsUserOnlineProvider } from '../context/is-user-online-provider';
 import api from '../api'
 
 

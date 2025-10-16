@@ -22,6 +22,8 @@ const echo = new Echo({
   auth: {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
+      Accept: "application/json",
+      'X-Requested-With': 'XMLHttpRequest',
     },
   }
 });

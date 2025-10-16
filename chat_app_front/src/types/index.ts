@@ -76,9 +76,9 @@ export interface Message {
     receiver: User;
     conversation_id: number;
     content: string;
+    attachments: Attachment[];
     created_at: string;
     updated_at: string;
-    attachments: Attachment[];
     [key: string]: unknown;
 }
 
@@ -99,6 +99,9 @@ export interface Attachment {
     path: string;
     mime: string;
     size: number;
+    url: string;
+    type: 'image' | 'file' | 'video' | 'audio' | 'document' | 'other';
+    created_at: string;
     [key: string]: unknown;
 }
 

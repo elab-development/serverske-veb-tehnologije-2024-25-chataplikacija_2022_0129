@@ -1,8 +1,8 @@
 import { NavMain } from '../components/nav-main';
 import { NavUser } from '../components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '../components/ui/sidebar';
-import { UserAndConversation, type Conversation, type NavItem } from '../types';
-import { CircleUserRound, SquarePen } from 'lucide-react';
+import { UserAndConversation } from '../types';
+import { SquarePen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useConversations } from '../context/conversations-provider';
 import { useEffect, useState } from 'react';
@@ -11,8 +11,6 @@ import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from './ui/dialog';
 
 import { useAuth } from '../context/auth-provider';
-import { IsUserOnlineProvider } from '../context/is-user-online-provider';
-import api from '../api'
 
 
 export function AppSidebar() {
@@ -27,7 +25,9 @@ export function AppSidebar() {
     const [createError, setCreateError] = useState('');
 
 const handleCreateConversation = async () => {
+    if (!user) return;
     if (!targetEmail.trim()) return;
+    
     setCreating(true);
     setCreateError('');
 

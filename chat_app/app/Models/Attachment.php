@@ -17,6 +17,22 @@ class Attachment extends Model
         'size',
     ];
 
+    protected $appends = [ 'url', 'type' ];
+
+    public function getUrlAttribute()
+    {
+        return asset('storage/' . $this->path);
+    }
+
+    public function getTypeAttribute()
+    {
+        if (str_starts_with($this->mime, 'image/')) return 'image';
+        if (str_starts_with($this->mime, 'video/')) return 'video';
+        if (str_starts_with($this->mime, 'audio/')) return 'audio';
+        if (in_array($this->mime, ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])) return 'document';
+        return 'file';
+    }
+
     public function message()
     {
         return $this->belongsTo(Message::class);

@@ -30,7 +30,7 @@ class MessageSent implements ShouldBroadcastNow
     {
         $channels = [];
 
-        $channels[] = new PresenceChannel('conversation.' . $this->message->conversation_id);
+        $channels[] = new PrivateChannel('conversation.' . $this->message->conversation_id);
         $channels[] = new PrivateChannel('user.' . $this->message->receiver_id);
 
         return $channels;
@@ -49,8 +49,8 @@ class MessageSent implements ShouldBroadcastNow
             'receiver' => $this->message->receiver,
             'conversation_id' => $this->message->conversation_id,
             'content' => $this->message->content,
-            'created_at' => $this->message->created_at,
-            'updated_at' => $this->message->updated_at
+            'attachments' => $this->message->attachments,
+            'created_at' => $this->message->created_at
         ];
     }
 }

@@ -1,17 +1,13 @@
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from './ui/sidebar';
-import { Conversation, User, UserAndConversation, type NavItem } from '../types';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from './ui/sidebar';
+import { UserAndConversation } from '../types';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useConversations } from '../context/conversations-provider';
-import { CircleUserRound, EllipsisVertical, Lock, ShieldUser } from 'lucide-react';
+import { Lock, ShieldUser } from 'lucide-react';
 import { useAuth } from '../context/auth-provider';
 import { Separator } from '@radix-ui/react-separator';
 import clsx from 'clsx';
 import AdminOptionsDropdown from './admin-options-dropdown';
-import { Avatar, AvatarFallback } from './ui/avatar';
 import { useInitials } from '../hooks/use-initials';
-import { useEffect, useState } from 'react';
-import echo from '../echo';
-import { useNotifications } from '../hooks/use-notifications';
 import { useIsUserOnline } from '../context/is-user-online-provider';
 
 export function NavMain({ items = [] }: { items: UserAndConversation[] }) {
@@ -19,14 +15,14 @@ export function NavMain({ items = [] }: { items: UserAndConversation[] }) {
     const { toggleSidebar } = useSidebar();
     const location = useLocation();
     const navigate = useNavigate();
-    const { addConversation } = useConversations();
+    const { addConversationForAdmin } = useConversations();
     const getInitials = useInitials();
     const { isUserOnline } = useIsUserOnline();
 
     const handleLinkClick = (item: UserAndConversation) => {
         toggleSidebar();
         if (!item.conversation) {
-            addConversation(item.user);
+            addConversationForAdmin(item.user);
         }
         else{
             navigate(`/conversations/${item.conversation.id}`);

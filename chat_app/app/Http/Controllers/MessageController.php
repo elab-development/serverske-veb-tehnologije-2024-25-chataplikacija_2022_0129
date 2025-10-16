@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use App\Models\User;
 use App\Models\Conversation;
+use App\Models\Attachment;
 use App\Events\MessageSent;
 use App\Http\Requests\StoreMessageRequest;
 use Illuminate\Http\Request;
@@ -36,9 +37,31 @@ class MessageController extends Controller
             'receiver_id' => 'required|exists:users,id',
             'conversation_id' => 'nullable|exists:conversations,id',
             'content' => 'nullable|string',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|max:10240',
         ]);
 
-        $message = Message::create($validated);
+        $message = Message::create([
+            'sender_id' => $validated['sender_id'],
+            'receiver_id' => $validated['receiver_id'],
+            'conversation_id' => $validated['conversation_id'],
+            'content' => $validated['content']
+        ]);
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $attachment) {
+                $path = $attachment->store('attachments', 'public');
+                Attachment::create([
+                    'message_id' => $message->id,
+                    'name' => $attachment->getClientOriginalName(),
+                    'path' => $path,
+                    'mime' => $attachment->getMimeType(),
+                    'size' => $attachment->getSize(),
+                ]);
+            }
+        }
+
+        $message->load(['sender', 'receiver', 'attachments']);
 
         broadcast(new MessageSent($message))->toOthers();
 
@@ -175,6 +198,8 @@ Posle obrade f-je:
         $request->validate([
             'receiver_id' => 'required|exists:users,id',
             'content' => 'nullable|string',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|max:10240',
         ]);
 
         $sender_id = Auth::id();
@@ -205,9 +230,23 @@ Posle obrade f-je:
             'content' => $request->content,
         ]);
 
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $path = $file->store('attachments', 'public');
+                
+                Attachment::create([
+                    'message_id' => $newMessage->id,
+                    'name' => $file->getClientOriginalName(),
+                    'path' => $path,
+                    'mime' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                ]);
+            }
+        }
+
         Conversation::where('id', $conversation->id)->update(['updated_at' => Carbon::now()]);
 
-        $message = Message::with(['sender', 'receiver'])->find($newMessage->id);
+        $message = Message::with(['sender', 'receiver', 'attachments'])->find($newMessage->id);
 
         broadcast(new MessageSent($message))->toOthers();
 

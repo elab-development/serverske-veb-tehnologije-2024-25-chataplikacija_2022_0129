@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\GiphyController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -30,6 +31,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/messages/by-conversation', [MessageController::class, 'getMessagesByConversation']);
 
     Route::post('/messages/translate', [MessageController::class, 'translate']);
+    Route::prefix('giphy')->group(function () {
+        Route::get('/search', [GiphyController::class, 'search']);
+        Route::get('/trending', [GiphyController::class, 'trending']);
+        Route::get('/{id}', [GiphyController::class, 'show']);
+    });
 });
 
 Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {

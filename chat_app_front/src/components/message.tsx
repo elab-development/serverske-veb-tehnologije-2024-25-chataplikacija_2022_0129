@@ -60,14 +60,26 @@ const MessageComponent = (prop: MessageProps) => {
                 <time className="text-xs opacity-50">{formatTime(prop.message.created_at)}</time>
             </div>
             <div className="chat-bubble chat-bubble-info p-4 max-w-150">
+
                 {prop.message.attachments && (
                     <ul className="list bg-base-200 rounded-box shadow-md">
-                        {attachments.map((attachment) => (
-                            <AttachmentComponent key={attachment.id} attachment={attachment} />
-                        ))}
+                        {attachments.map((attachment) => {
+                            if (attachment.is_giphy) {
+                                console.log(attachment);
+                                return(
+                                    <li className="list-row">
+                                        <img src={attachment.path} alt={attachment.name} />
+                                    </li>
+                                )
+                            }
+                            else {
+                                return <AttachmentComponent key={attachment.id} attachment={attachment} />
+                            }
+                        })}
                     </ul>
                 )}
                 {translating ? 'Translating...' : displayText}
+
             </div>
             <div className="chat-footer opacity-50">
                 <span onClick={handleTranslate} className="cursor-pointer">{isTranslated ? 'Original' : 'Translate'}</span>

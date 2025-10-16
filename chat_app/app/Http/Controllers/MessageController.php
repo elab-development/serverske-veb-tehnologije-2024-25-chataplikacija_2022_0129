@@ -200,6 +200,7 @@ Posle obrade f-je:
             'content' => 'nullable|string',
             'attachments' => 'nullable|array',
             'attachments.*' => 'file|max:10240',
+            'gif_url' => 'nullable|url',
         ]);
 
         $sender_id = Auth::id();
@@ -230,7 +231,31 @@ Posle obrade f-je:
             'content' => $request->content,
         ]);
 
+        \Log::info('Giphy URL: ' . $request->gif_url);
+
+        if ($request->gif_url) {
+            $gifUrl = $request->gif_url;
+            \Log::info('Usao u if i napravio Giphy URL: ' . $gifUrl);
+            $fileName = basename(parse_url($gifUrl, PHP_URL_PATH));
+
+            \Log::info('Napravio fileName: ' . $fileName);
+            
+            $attachment = Attachment::create([
+                'message_id' => $newMessage->id,
+                'name' => $fileName ?: 'giphy.gif',
+                'path' => $gifUrl,
+                'url' => $gifUrl,
+                'mime' => 'image/gif',
+                'size' => 0,
+                'type' => 'image',
+                'is_giphy' => true,
+            ]);
+
+            \Log::info('Napravio Giphy attachment: ',  [$attachment]);
+        }
+
         if ($request->hasFile('attachments')) {
+            \Log::info('Usao i u drugi if');
             foreach ($request->file('attachments') as $file) {
                 $path = $file->store('attachments', 'public');
                 
@@ -240,6 +265,8 @@ Posle obrade f-je:
                     'path' => $path,
                     'mime' => $file->getMimeType(),
                     'size' => $file->getSize(),
+                    'type' => $this->determineFileType($file->getMimeType()),
+                    'is_giphy' => false
                 ]);
             }
         }
@@ -251,6 +278,25 @@ Posle obrade f-je:
         broadcast(new MessageSent($message))->toOthers();
 
         return response()->json($message, 201);
+    }
+
+    private function determineFileType(string $mimeType): string
+    {
+        if (str_starts_with($mimeType, 'image/')) {
+            return 'image';
+        } elseif (str_starts_with($mimeType, 'video/')) {
+            return 'video';
+        } elseif (str_starts_with($mimeType, 'audio/')) {
+            return 'audio';
+        } elseif (in_array($mimeType, [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ])) {
+            return 'document';
+        }
+
+        return 'other';
     }
 
 

@@ -1,16 +1,21 @@
 import React, { useRef, useState } from 'react'
-import { Plus, Send } from 'lucide-react'
+import { ImageIcon, Plus, Send } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useConversations } from '../context/conversations-provider';
 import api from '../api';
 import { Message } from '../types';
+import { GiphyGif } from '../services/giphy-service';
+import { Button } from './ui/button';
+import GiphyPicker from './giphy-picker';
 
 const SendMessageForm = () => {
     const {selectedConversation, refetch} = useConversations();
     const [newMessage, setNewMessage] = useState('');
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    //const [selectedGif, setSelectedGif] = useState<GiphyGif | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showGiphyPicker, setShowGiphyPicker] = useState(false);
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
@@ -30,6 +35,36 @@ const SendMessageForm = () => {
         setSelectedFiles(prev => prev.filter((_, i) => i !== index));
     };
 
+    const handleGifSelect = async (gif: GiphyGif) => {
+        if (!selectedConversation) {
+            return;
+        }
+
+        setShowGiphyPicker(false);
+
+        try {
+            setLoading(true);
+
+            const formData = new FormData();
+            formData.append('receiver_id', selectedConversation.user.id.toString());
+            formData.append('gif_url', gif.images.original.url);
+
+            await api.post<Message>('/send-message', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            await refetch();
+        } catch (err: any) {
+            console.error('Error sending GIF:', err);
+            toast.error("Greška pri slanju GIF-a: " + err.message);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const sendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -37,7 +72,7 @@ const SendMessageForm = () => {
             return;
         }
         
-        if(!newMessage.trim()) {
+        if(!newMessage.trim() && selectedFiles.length === 0) {
             return;
         }
 
@@ -46,6 +81,7 @@ const SendMessageForm = () => {
 
             const formData = new FormData();
             formData.append('receiver_id', selectedConversation.user.id.toString());
+            
             if(newMessage.trim()) {
                 formData.append('content', newMessage);
             }
@@ -74,7 +110,18 @@ const SendMessageForm = () => {
     };
 
     return (
+    <>
         <form onSubmit={sendMessage} className="flex items-center mt-4 flex-shrink-0 justify-between bg-base ">
+            <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setShowGiphyPicker(true)}
+                    disabled={loading}
+                    title='Send GIF'
+                >
+                <ImageIcon className="h-4 w-4" />
+            </Button>
             <details className="dropdown dropdown-top">
                 <summary className="btn m-1 btn-info btn-circle btn-sm"> <Plus /> </summary>
                 <div tabIndex={0} className="dropdown-content card card-sm bg-base-100 z-1 w-64 shadow-md">
@@ -100,10 +147,17 @@ const SendMessageForm = () => {
                 </div>
             </details>
 
-            <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder="Type your message..." className="input input-ghost flex-grow" disabled={loading} required/>
+            <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} placeholder="Type your message..." className="input input-ghost flex-grow" disabled={loading}/>
             
             <button type="submit" className="btn btn-ghost" disabled={loading}> <Send /> </button>
         </form>
+        <GiphyPicker
+            open={showGiphyPicker}
+            onClose={() => setShowGiphyPicker(false)}
+            onSelect={handleGifSelect}
+            sending={loading}
+        />
+    </>
   )
 }
 

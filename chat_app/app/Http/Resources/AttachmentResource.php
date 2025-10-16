@@ -21,6 +21,7 @@ class AttachmentResource extends JsonResource
             'path' => $this->path,
             'mime' => $this->mime,
             'size' => $this->size,
+            'is_giphy' => $this->is_giphy,
         ];
     }
 }

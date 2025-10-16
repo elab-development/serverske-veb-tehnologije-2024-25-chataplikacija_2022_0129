@@ -121,6 +121,7 @@ export interface Attachment {
     size: number;
     url: string;
     type: 'image' | 'file' | 'video' | 'audio' | 'document' | 'other';
+    is_giphy: boolean;
     created_at: string;
     [key: string]: unknown;
 }

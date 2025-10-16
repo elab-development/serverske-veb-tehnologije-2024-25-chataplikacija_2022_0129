@@ -15,6 +15,11 @@ class Attachment extends Model
         'path',
         'mime',
         'size',
+        'is_giphy',
+    ];
+
+    protected $casts = [
+        'is_giphy' => 'boolean',
     ];
 
     protected $appends = [ 'url', 'type' ];

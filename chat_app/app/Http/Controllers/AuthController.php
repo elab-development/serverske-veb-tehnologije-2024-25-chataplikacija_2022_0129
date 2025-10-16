@@ -51,16 +51,32 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
-        \Log::info('user type', ['user' => $user]);
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+        if (!$user) {
+            return response()->json([
+                'message' => 'No account found with this email address.',
+                'errors' => [
+                    'email' => ['No account found with this email address.']
+                ]
+            ], 422);
+        }
+
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'message' => 'The password is incorrect.',
+                'errors' => [
+                    'email' => ['The password is incorrect.']
+                ]
+            ], 422);
         }
 
         if ($user->is_blocked) {
-            return response()->json(['message' => 'Your account has been blocked.'], 403);
+            return response()->json([
+                'message' => 'Your account has been blocked.',
+                'errors' => [
+                    'general' => ['Your account has been blocked.']
+                ]
+            ], 403);
         }
 
         $user->tokens()->delete();
@@ -89,7 +105,6 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        \Log::info('user type', ['user' => $request->user()]);
         return response()->json($request->user());
     }
 }

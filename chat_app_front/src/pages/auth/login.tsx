@@ -36,20 +36,37 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         try {
             await login({email, password}, remember === true);
             navigate('/');
+
         } catch (error: any) {
             const axiosError = error as AxiosError<ValidationError>;
-            if(axiosError.response?.data?.errors){
+        
+        if (axiosError.response) {
+            const { data, status } = axiosError.response;
+            
+            if (data?.errors) {
                 const validationErrors: Record<string, string> = {};
-                Object.entries(axiosError.response.data.errors).forEach(([key, messages]) => {
-                    validationErrors[key] = messages[0];
+                Object.entries(data.errors).forEach(([key, messages]) => {
+                    validationErrors[key] = Array.isArray(messages) ? messages[0] : messages;
                 });
                 setErrors(validationErrors);
-            }
-            else{
+            } else if (data?.message) {
                 setErrors({
-                    general: axiosError.response?.data?.message || 'Registration failed',
+                    general: data.message,
+                });
+            } else {
+                setErrors({
+                    general: `Login failed (${status})`,
                 });
             }
+        } else if (axiosError.request) {
+            setErrors({
+                general: 'Network error. Please check your connection.',
+            });
+        } else {
+            setErrors({
+                general: 'An unexpected error occurred.',
+            });
+        }
         } finally {
             setProcessing(false);
         }
@@ -58,6 +75,12 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     return (
         <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
             <h1 className="sr-only">Log in</h1>
+
+            {errors.general && (
+                <div className="mb-4 text-center text-sm font-medium text-red-600">
+                    {errors.general}
+                </div>
+            )}
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                 <div className="grid gap-6">

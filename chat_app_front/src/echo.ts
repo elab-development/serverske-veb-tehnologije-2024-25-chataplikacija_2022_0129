@@ -16,7 +16,7 @@ const echo = new Echo({
   wsHost: import.meta.env.VITE_REVERB_HOST || "localhost",
   wsPort: import.meta.env.VITE_REVERB_PORT || 8080,
   wssPort: import.meta.env.VITE_REVERB_PORT || 8080,
-  forceTLS: (import.meta.env.VITE_REVERB_SCHEME || "http") === "https",
+  forceTLS: (import.meta.env.VITE_REVERB_SCHEME || "https") === "https",
   enabledTransports: ["ws", "wss"],
   authEndpoint: `${import.meta.env.VITE_API_URL}/broadcasting/auth`,
   auth: {

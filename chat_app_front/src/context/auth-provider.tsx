@@ -53,6 +53,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 setUser(JSON.parse(savedUser));
                 setLoading(false);
 
+                if(user?.is_blocked){
+                    logout();
+                    setLoading(false);
+                    return;
+                }
+
                 const response = await api.get<User>('/user');
                 setUser(response.data);
                 localStorage.setItem('user', JSON.stringify(response.data));

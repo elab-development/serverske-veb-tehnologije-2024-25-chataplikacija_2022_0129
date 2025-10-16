@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import AppLayout from './layouts/app-layout'
 import Home from './pages/Home'
 import Login from './pages/auth/login'
 import { ProtectedRoute } from './routes/protected-route'

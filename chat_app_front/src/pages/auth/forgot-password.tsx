@@ -12,8 +12,12 @@ import { Label } from '../../components/ui/label';
 import AuthLayout from '../../layouts/auth-layout';
 import { useState } from 'react';
 import api from '../../api';
+import { useAuth } from '../../context/auth-provider';
+import { AxiosError } from 'axios';
+import { ApiError } from '../../types';
 
 export default function ForgotPassword() {
+    const { forgotPassword } = useAuth();
     const [email, setEmail] = useState('');
     const [processing, setProcessing] = useState(false);
     const [error, setError] = useState('');
@@ -26,15 +30,15 @@ export default function ForgotPassword() {
         setStatus('');
 
         try{
-            const response = await api.post('/forgot-password', { email });
+            const response = await forgotPassword({ email });
             setEmail('');
-            setStatus(response.data.message || 'Password reset link sent successfully');
+            setStatus(response.message || 'Password reset link sent successfully');
         } catch (error: any) {
-            const message = error.response?.data?.message || 'Failed to send password reset link';
-            setError(message);
-
-            if (error.response?.data?.errors?.email) {
-                setError(error.response.data.errors.email[0]);
+            const axiosError = error as AxiosError<ApiError>;
+            if (axiosError.response?.data?.message) {
+                setError(axiosError.response.data.message);
+            } else {
+                setError('Došlo je do greške pri slanju emaila');
             }
         } finally {
             setProcessing(false);

@@ -1,6 +1,6 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
 import api from "../api";
-import type { AuthResponse, LoginCredentials, RegisterCredentials, User } from "../types";
+import type { AuthResponse, LoginCredentials, RegisterCredentials, User , ForgotPasswordRequest, ResetPasswordRequest, ForgotPasswordResponse, ResetPasswordResponse} from "../types";
 import { useNavigate } from "react-router-dom";
 
 interface AuthContextProps {
@@ -9,6 +9,8 @@ interface AuthContextProps {
     register: (creditentials: RegisterCredentials) => Promise<AuthResponse>;
     login: (creditentials: LoginCredentials, remember?: boolean) => Promise<AuthResponse>;
     logout: () => void;
+    forgotPassword: (data: ForgotPasswordRequest) => Promise<ForgotPasswordResponse>;
+    resetPassword: (data: ResetPasswordRequest) => Promise<ResetPasswordResponse>;
     isAuthenticated: boolean
 }
 
@@ -119,12 +121,32 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
     };
 
+    const forgotPassword = async (data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> => {
+        try {
+            const response = await api.post<ForgotPasswordResponse>('/forgot-password', data);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    const resetPassword = async (data: ResetPasswordRequest): Promise<ResetPasswordResponse> => {
+        try {
+            const response = await api.post<ResetPasswordResponse>('/reset-password', data);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    };
+
     const value: AuthContextProps = {
         user,
         loading,
         register,
         login,
         logout,
+        forgotPassword,
+        resetPassword,
         isAuthenticated: !!user,
     };
 

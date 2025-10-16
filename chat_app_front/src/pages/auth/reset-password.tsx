@@ -8,40 +8,64 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import AuthLayout from '../../layouts/auth-layout';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../../api';
+import { useAuth } from '../../context/auth-provider';
+import toast from 'react-hot-toast';
+import { AxiosError } from 'axios';
+import { ApiError, ValidationError } from '../../types';
 
 export default function ResetPassword() {
+    const { resetPassword } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
     const token = searchParams.get('token') || '';
-    const emailParam = searchParams.get('email') || '';
 
-    const [email] = useState(emailParam);
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [password_confirmation, setPasswordConfirmation] = useState('');
+    const [passwordConfirmation, setPasswordConfirmation] = useState('');
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        const emailParam = searchParams.get('email');
+        if (emailParam) {
+            setEmail(decodeURIComponent(emailParam));
+        }
+        
+        if (!token) {
+            setErrors({general: 'Nevažeći link za resetovanje lozinke'});
+        }
+    }, [searchParams, token]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setProcessing(true);
         setErrors({});
 
+        if (password !== passwordConfirmation) {
+            setErrors({password: 'Passwords do not match'});
+            setProcessing(false);
+            return;
+        }
+
         try {
-            await api.post('/reset-password', { token, email, password, password_confirmation });
-            navigate('/login', {
-                state: {
-                    message: 'Password reset successfully',
-                },
-            });
+            await resetPassword({ email, password, password_confirmation: passwordConfirmation, token, });
+            toast.success('Password reset successfully', { duration: 4000 });
+            navigate('/login');
         } catch (error: any) {
-            if (error.response?.data?.errors) {
-                setErrors(error.response.data.errors);
-            } else {
+            const axiosError = error as AxiosError<ValidationError>;
+            if(axiosError.response?.data?.errors){
+                const validationErrors: Record<string, string> = {};
+                Object.entries(axiosError.response.data.errors).forEach(([key, messages]) => {
+                    validationErrors[key] = messages[0];
+                });
+                setErrors(validationErrors);
+            }
+            else{
                 setErrors({
-                    general: error.response?.data?.message || 'Failed to reset password',
+                    general: axiosError.response?.data?.message || 'Registration failed',
                 });
             }
         } finally {
@@ -93,7 +117,7 @@ export default function ResetPassword() {
                             autoComplete="new-password"
                             className="mt-1 block w-full"
                             placeholder="Confirm password"
-                            value={password_confirmation}
+                            value={passwordConfirmation}
                             onChange={(e) => setPasswordConfirmation(e.target.value)}
                             required
                         />

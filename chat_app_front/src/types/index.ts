@@ -57,6 +57,26 @@ export interface AuthResponse {
     expires_at: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  password: string;
+  password_confirmation: string;
+  token: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
+}
+
+
 export interface User {
     id: number;
     name: string;

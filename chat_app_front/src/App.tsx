@@ -8,6 +8,8 @@ import { AuthProvider } from './context/auth-provider'
 import { ConversationsProvider } from './context/conversations-provider'
 import { IsUserOnlineProvider } from './context/is-user-online-provider'
 import { Toaster } from 'react-hot-toast'
+import ResetPassword from './pages/auth/reset-password'
+import ForgotPassword from './pages/auth/forgot-password'
 
 function App() {
 
@@ -29,6 +31,12 @@ function App() {
               <Route path='/register' element={
                 <Register />
               }/>
+              <Route path="/forgot-password" element={
+                <ForgotPassword />
+              } />
+              <Route path="/reset-password" element={
+                <ResetPassword />
+              } />
               <Route path="/conversations/:conversationId?" element={
                 <Home />
               } />
